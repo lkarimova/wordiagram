@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Frame from '@/components/Frame';
 
 export default async function Home() {
-  // Placeholder image for mock mode until DB wired into UI
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const tz = 'ET';

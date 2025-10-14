@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/generate", "schedule": "0 6 * * *", "region": "iad" },
+    { "path": "/api/update", "schedule": "0 */4 * * *", "region": "iad" }
+  ]
+}
