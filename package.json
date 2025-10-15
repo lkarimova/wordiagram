@@ -2,6 +2,7 @@
   "name": "world-news-painting",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": ">=18" }
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
@@ -35,4 +36,4 @@
     "vitest": "^3.2.4"
   }
 }
-"engines": { "node": ">=18" }
+
