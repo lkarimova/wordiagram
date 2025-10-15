@@ -1,9 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    eslint: {
-      // Don't fail the Vercel build on ESLint errors.
-      ignoreDuringBuilds: true,
+    eslint: { ignoreDuringBuilds: true },
+    images: {
+      remotePatterns: [
+        { protocol: "https", hostname: "*.supabase.co" }, // Supabase Storage public URLs
+      ],
     },
   };
   export default nextConfig;
