@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 // If your function lives at src/server/generation.ts and exports runDailyGenerate
-import { runDailyGeneration } from "@/src/server/generation";
+import { runDailyGeneration } from "@/server/generation";
 
 export async function GET(req: NextRequest) {
   // Optional: secure with CRON_SECRET for Vercel Cron/manual hits

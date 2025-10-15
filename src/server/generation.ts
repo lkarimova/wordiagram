@@ -3,7 +3,7 @@ import { config } from '@/lib/config';
 import { fetchWorldNews, fetchArtNews, rankAndCluster } from '@/lib/news';
 import { buildContentMotifs, buildStyleDescriptor, composePaintingPrompt } from '@/lib/prompts/builders';
 import { generateDailyBase } from '@/lib/image';
-import { storePublicBlob } from '@/lib/storage';
+import { savePngToStorage } from "@/lib/storage";
 import { insertDailyPainting } from './supabase';
 
 function todayInTimezone(): string {
@@ -22,7 +22,7 @@ export async function runDailyGeneration() {
   const composed = composePaintingPrompt(motifs, style);
 
   const image = await generateDailyBase(composed.prompt, composed.negative_prompt, config.aspect.width, config.aspect.height);
-  const imgUrl = await storePublicBlob(`${dateStr}/base.png`, image, 'image/png');
+  const imgUrl = await savePngToStorage(`${dateStr}/base.png`, image);
 
   const row = await insertDailyPainting({
     date: dateStr,

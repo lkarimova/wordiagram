@@ -7,7 +7,7 @@ export default async function Home() {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   const tz = 'ET';
-  const placeholder = "https://placehold.co/768x1024/png?text=Wordiagram";
+  const placeholder = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAI0lEQVQokWP8////fwYgYGBg+M9AgQGQ2QEUJgYFQ4g0g3EFAH5oAqK5nGxgAAAAASUVORK5CYII=';
   return (
     <main className="min-h-screen bg-white text-black">
       <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center gap-6">

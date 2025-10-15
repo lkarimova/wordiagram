@@ -1,4 +1,14 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
+
+const URL = process.env.SUPABASE_URL!;
+const ANON = process.env.SUPABASE_ANON_KEY!;
+const SERVICE = process.env.SUPABASE_SERVICE_ROLE; 
+
+const anon = () => createClient(URL, ANON, { auth: { persistSession: false } });
+const svc = () => {
+  if (!SERVICE) throw new Error("SUPABASE_SERVICE_ROLE missing");
+  return createClient(URL, SERVICE, { auth: { persistSession: false } });
+};
 
 export function getSupabase() {
   const url = process.env.SUPABASE_URL;

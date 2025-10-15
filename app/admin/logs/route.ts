@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { basicAuth } from '@/lib/utils/auth';
+import { basicAuth } from '@/src/lib/utils/auth';
 
 export async function GET(request: NextRequest) {
   const auth = basicAuth(request);
