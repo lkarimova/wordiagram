@@ -15,15 +15,16 @@ type AllowedSize =
   | "1024x1792";
 
 function toAllowedSize(w: number, h: number): AllowedSize {
-  // Portrait vs landscape shortcut; pick the closest supported
-  if (h > w) {
-    // portrait: prefer 1024x1536 (close to 3:4), fallback 1024x1792 if you want taller
-    return "1024x1536";
-  } else if (w > h) {
-    // landscape: pick something sensible if ever used
-    return "1536x1024";
-  }
-  return "1024x1024";
+  if (h > w) return "1024x1536";           // portrait (close to 3:4)
+  if (w > h) return "1536x1024";           // landscape
+  return "1024x1024";                      // square fallback
+}
+
+async function fetchToBytes(url: string): Promise<Uint8Array> {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`fetch image failed: ${res.status}`);
+  const buf = await res.arrayBuffer();
+  return new Uint8Array(buf);
 }
 
 async function generatePng(opts: GenOpts): Promise<Uint8Array> {
@@ -32,23 +33,30 @@ async function generatePng(opts: GenOpts): Promise<Uint8Array> {
   const res = await client.images.generate({
     model: "gpt-image-1",
     prompt: opts.prompt,
-    size,                          // ← use allowed size
-    response_format: "b64_json",
+    background: "transparent",
+    quality: "medium",
+    size,                 // ← remove response_format; let SDK choose
+    // optional: background: "transparent", quality: "medium",
   });
 
-  const data = res.data as Array<{ b64_json?: string }> | undefined;
-  if (!data?.[0]?.b64_json) throw new Error("OpenAI Images returned empty data");
+  const item = res.data?.[0];
+  if (!item) throw new Error("OpenAI Images returned empty data");
 
-  const b64 = data[0].b64_json!;
-  return Uint8Array.from(Buffer.from(b64, "base64"));
+  // Handle either base64 or URL responses
+  if (item.b64_json) {
+    return Uint8Array.from(Buffer.from(item.b64_json, "base64"));
+  }
+  if (item.url) {
+    return fetchToBytes(item.url);
+  }
+  throw new Error("Images response missing b64_json and url");
 }
 
-// Keep the public API the same as before
+// Public API used elsewhere
 export async function generateBaseImage(opts: { prompt: string; width: number; height: number }) {
   return generatePng(opts);
 }
 export async function inpaintOrOverlay(opts: { base: Uint8Array; prompt: string; mask?: Uint8Array }) {
-  // Default portrait size; callers didn’t pass size
   return generatePng({ prompt: opts.prompt, width: 1024, height: 1536 });
 }
 export async function restyle(opts: { base: Uint8Array; prompt: string }) {
