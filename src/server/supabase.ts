@@ -69,26 +69,55 @@ export async function getDailyByDate(date: string) {
 export async function listArchive(limit = 60) {
   const { data, error } = await anon()
     .from("daily_paintings")
-    .select("id,date,final_image_url,base_image_url")
+    .select("id,date,final_image_url,base_image_url,created_at")
     .order("date", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as Pick<
-    DailyPainting,
-    "id" | "date" | "final_image_url" | "base_image_url"
-  >[];
+
+  const seen = new Set<string>();
+  const deduped = [];
+  for (const row of data ?? []) {
+    if (seen.has(row.date)) continue;
+    seen.add(row.date);
+    deduped.push(row);
+    if (deduped.length >= limit) break;
+  }
+  return deduped as Pick<DailyPainting, "id"|"date"|"final_image_url"|"base_image_url" | "created_at">[];
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
 // WRITES (Service Role) — bypasses RLS
 export async function insertDailyPainting(row: Omit<DailyPainting, "id">) {
-  const { data, error } = await svc()
+  const client = svc();
+
+  // 1) do we already have a row for this date?
+  const { data: existing, error: qErr } = await client
     .from("daily_paintings")
-    .insert(row)
-    .select()
-    .single();
-  if (error) throw error;
-  return data as DailyPainting;
+    .select("id")
+    .eq("date", row.date)
+    .maybeSingle();
+  if (qErr) throw qErr;
+
+  if (existing) {
+    // 2) update the existing row
+    const { data, error } = await client
+      .from("daily_paintings")
+      .update(row)
+      .eq("id", existing.id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as DailyPainting;
+  } else {
+    // 3) insert a new row
+    const { data, error } = await client
+      .from("daily_paintings")
+      .insert(row)
+      .select()
+      .single();
+    if (error) throw error;
+    return data as DailyPainting;
+  }
 }
 
 export async function updateDailyFinalImage(id: string, finalUrl: string) {
