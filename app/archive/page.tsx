@@ -19,7 +19,7 @@ export default async function ArchivePage() {
             const url = p.final_image_url || p.base_image_url;
             return (
               <Link key={p.id} href={`/painting/${p.date}`} className="block">
-                <div className="relative w-full" style={{ aspectRatio: "3 / 4" }}>
+                <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
                   <Image
                     src={url}
                     alt={p.date}

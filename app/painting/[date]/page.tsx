@@ -12,7 +12,7 @@ export default async function PaintingByDate({ params }: Props) {
   return (
     <main className="min-h-screen bg-white text-black">
       <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="relative w-full" style={{ aspectRatio: "3 / 4" }}>
+        <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
           {url ? (
             <Image src={url} alt={`Painting ${date}`} fill style={{ objectFit: "cover" }} />
           ) : (
