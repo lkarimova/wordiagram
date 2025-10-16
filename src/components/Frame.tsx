@@ -1,4 +1,3 @@
-// src/components/Frame.tsx
 export default function Frame({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -6,26 +5,27 @@ export default function Frame({ children }: { children: React.ReactNode }) {
       style={{
         aspectRatio: "3 / 4",
         width: "min(80vw, calc(80vh * 3 / 4))",
-        boxSizing: "content-box",
-        padding: "10px", // space for the frame stroke so it won’t look clipped
       }}
     >
+      {/* Inner content window: inset from the edges so the frame remains visible */}
+      <div className="absolute inset-3 md:inset-4 bg-white">
+        {/* Parent for <Image fill>: must be relative and fill this window */}
+        <div className="relative w-full h-full overflow-hidden">
+          {children}
+        </div>
+      </div>
+
+      {/* Frame on TOP of the content */}
       <svg
-        className="pointer-events-none absolute inset-0 w-full h-full"
+        className="pointer-events-none absolute inset-0 w-full h-full z-10"
         viewBox="0 0 100 133"
         preserveAspectRatio="xMidYMid meet"
         aria-hidden
       >
-        {/* a bit more margin inside so thick strokes never kiss the edge */}
         <rect x="2" y="2" width="96" height="129" fill="none" stroke="#2c2c2c" strokeWidth="2" />
         <rect x="5" y="5" width="90" height="123" fill="none" stroke="#bfa26a" strokeWidth="1.5" />
         <rect x="8" y="8" width="84" height="117" fill="none" stroke="#2c2c2c" strokeWidth="0.8" />
       </svg>
-
-      {/* Parent for <Image fill>: must be relative and sized */}
-      <div className="relative w-full h-full bg-white overflow-hidden">
-        {children}
-      </div>
     </div>
   );
 }
