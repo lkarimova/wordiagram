@@ -2,8 +2,8 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import Frame from '@/components/Frame';
-import { getLatestDaily } from '@/server/supabase';
+import Frame from '@/src/components/Frame';
+import { getLatestDaily } from '@/src/server/supabase';
 
 export default async function Home() {
   // Placeholder image for mock mode until DB wired into UI
