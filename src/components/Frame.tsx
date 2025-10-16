@@ -1,6 +1,14 @@
 export default function Frame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative mx-auto" style={{ aspectRatio: '3 / 4', maxWidth: 768 }}>
+    <div
+      className="relative mx-auto"
+      style={{
+        aspectRatio: "3 / 4",
+        // Width is limited by either viewport width (vw) or viewport height (vh * 3/4)
+        // so the resulting height never exceeds ~90vh and it never overflows width.
+        width: "min(90vw, calc(90vh * 3 / 4))",
+      }}
+    >
       <svg
         className="pointer-events-none absolute inset-0 w-full h-full"
         viewBox="0 0 100 133"
@@ -12,7 +20,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
         <rect x="7" y="7" width="86" height="119" fill="none" stroke="#2c2c2c" strokeWidth="0.8" />
       </svg>
 
-      {/* Make the immediate parent of <Image fill> be relative with size */}
+      {/* parent for <Image fill> must be relative with size */}
       <div className="relative w-full h-full p-3 bg-white overflow-hidden">
         {children}
       </div>
