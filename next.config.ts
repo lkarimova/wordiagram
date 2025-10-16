@@ -5,7 +5,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", 
-        hostname: "db.dvdkogqoljihyjjmcmdy.supabase.co", 
+        hostname: "dvdkogqoljihyjjmcmdy.supabase.co", 
         pathname: "/storage/v1/object/public/images/**" }, // Supabase Storage public URLs
     ],
   },
