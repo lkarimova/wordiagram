@@ -21,8 +21,7 @@ export default async function Home() {
               alt="World-News Painting"
               fill
               style={{ objectFit: "cover" }}
-              // TEMP: if you still see a broken image, uncomment next line to bypass Next/Image optimization while you confirm allowlist:
-              // unoptimized
+              unoptimized
               priority
             />
           ) : (
