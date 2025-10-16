@@ -7,7 +7,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
         aspectRatio: "3 / 4",
         width: "min(80vw, calc(80vh * 3 / 4))",
         boxSizing: "content-box",
-        padding: "8px", // space for the frame stroke so it won’t look clipped
+        padding: "20px", // space for the frame stroke so it won’t look clipped
       }}
     >
       <svg
