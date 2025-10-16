@@ -6,6 +6,7 @@ import { generateDailyBase } from '@/lib/image';
 import { savePngToStorage } from "@/lib/storage";
 import { insertDailyPainting } from './supabase';
 
+
 function todayInTimezone(): string {
   const now = new Date();
   return formatInTimeZone(now, config.timezone, 'yyyy-MM-dd');
