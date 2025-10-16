@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import Frame from '@/src/components/Frame';
-import { getLatestDaily } from '@/src/server/supabase';
+import Frame from '@/components/Frame';
+import { getLatestDaily } from '@/server/supabase';
 
 export default async function Home() {
   // Placeholder image for mock mode until DB wired into UI
@@ -16,7 +16,14 @@ export default async function Home() {
       <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center gap-6">
         <Frame>
           {url ? (
-            <img src={url} alt="World-News Painting" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            <Image 
+              src={url}
+              alt="World-News Painting"
+              fill
+              style={{ objectFit: "cover" }}
+              unoptimized
+              priority
+            />
           ) : (
             <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
               No image yet
