@@ -16,14 +16,7 @@ export default async function Home() {
       <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center gap-6">
         <Frame>
           {url ? (
-            <Image
-              src={url}
-              alt="World-News Painting"
-              fill
-              style={{ objectFit: "cover" }}
-              unoptimized
-              priority
-            />
+            <img src={url} alt="World-News Painting" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
               No image yet
