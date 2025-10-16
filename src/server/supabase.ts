@@ -1,5 +1,7 @@
 // src/server/supabase.ts
 import { createClient } from "@supabase/supabase-js";
+import { formatInTimeZone } from "date-fns-tz";
+const TZ = "America/New_York";
 
 const URL = process.env.SUPABASE_URL!;
 const ANON = process.env.SUPABASE_ANON_KEY!;
@@ -67,9 +69,11 @@ export async function getDailyByDate(date: string) {
 }
 
 export async function listArchive(limit = 60) {
+  const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
   const { data, error } = await anon()
     .from("daily_paintings")
     .select("id,date,final_image_url,base_image_url,created_at")
+    .neq("date", today)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false });
   if (error) throw error;

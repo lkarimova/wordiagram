@@ -1,9 +1,13 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { listArchive } from "@/src/server/supabase";
+import { formatInTimeZone } from "date-fns-tz";
+const TZ = "America/New_York";
 
 export default async function ArchivePage() {
   const items = await listArchive(60);
+  const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
+  const pastOnly = items.filter(i => i.date !== today);
   return (
     <main className="min-h-screen bg-white text-black">
     <div className="max-w-6xl mx-auto px-4 py-10">
