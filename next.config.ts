@@ -4,7 +4,9 @@ const nextConfig = {
   eslint: { ignoreDuringBuilds: true },
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "db.dvdkogqoljihyjjmcmdy.supabase.co", pathname: "/storage/wordiagram/object/public/images/**" }, // Supabase Storage public URLs
+      { protocol: "https", 
+        hostname: "db.dvdkogqoljihyjjmcmdy.supabase.co", 
+        pathname: "/storage/v1/object/public/images/**" }, // Supabase Storage public URLs
     ],
   },
 };
