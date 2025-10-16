@@ -1,31 +1,28 @@
-// src/components/Frame.tsx
 export default function Frame({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="relative mx-auto"
       style={{
-        aspectRatio: "2 / 3",                          // ← was 3/4
-        width: "min(80vw, calc(80vh * 2 / 3))",        // ← scale ~80% of viewport height
-        overflow: "visible",
+        aspectRatio: "2 / 3",
+        // Width is limited by either viewport width (vw) or viewport height (vh * 2/3)
+        // so the resulting height never exceeds ~80vh and it never overflows width.
+        width: "min(80vw, calc(80vh * 3 / 4))",
       }}
     >
-      {/* Frame behind the content */}
       <svg
-        className="pointer-events-none absolute inset-0 w-full h-full z-0"
-        viewBox="0 0 100 150"                          // ← 2:3-friendly viewBox
-        preserveAspectRatio="xMidYMid meet"
+        className="pointer-events-none absolute inset-0 w-full h-full"
+        viewBox="0 0 100 133"
+        preserveAspectRatio="none"
         aria-hidden
       >
-        <rect x="2" y="2"   width="96" height="146" fill="none" stroke="#2c2c2c" strokeWidth="2" />
-        <rect x="5" y="5"   width="90" height="140" fill="none" stroke="#bfa26a" strokeWidth="1.5" />
-        <rect x="8" y="8"   width="84" height="134" fill="none" stroke="#2c2c2c" strokeWidth="0.8" />
+        <rect x="1" y="1" width="98" height="131" fill="none" stroke="#2c2c2c" strokeWidth="2" />
+        <rect x="4" y="4" width="92" height="125" fill="none" stroke="#bfa26a" strokeWidth="1.5" />
+        <rect x="7" y="7" width="86" height="119" fill="none" stroke="#2c2c2c" strokeWidth="0.8" />
       </svg>
 
-      {/* Inner mat so art never kisses the frame edge */}
-      <div className="absolute inset-4 md:inset-5 bg-white z-10">
-        <div className="relative w-full h-full overflow-hidden">
-          {children} {/* <Image fill ... /> goes here */}
-        </div>
+      {/* parent for <Image fill> must be relative with size */}
+      <div className="relative w-full h-full p-3 bg-white overflow-hidden">
+        {children}
       </div>
     </div>
   );
