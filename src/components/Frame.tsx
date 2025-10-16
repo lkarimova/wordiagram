@@ -6,7 +6,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
         aspectRatio: "3 / 4",
         // Width is limited by either viewport width (vw) or viewport height (vh * 3/4)
         // so the resulting height never exceeds ~90vh and it never overflows width.
-        width: "min(90vw, calc(90vh * 3 / 4))",
+        width: "min(80vw, calc(80vh * 3 / 4))",
       }}
     >
       <svg
