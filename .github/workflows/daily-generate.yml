@@ -1,0 +1,22 @@
+name: Daily Generate (6am ET)
+
+on:
+  schedule:
+    - cron: "0 10 * * *"   # UTC; change when DST shifts
+  workflow_dispatch:
+
+jobs:
+  call-generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/generate (Production)
+        env:
+          SITE_URL: https://www.wordiagram.com
+          TOKEN: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          URL="${SITE_URL}/api/generate?token=${TOKEN}"
+          echo "GET $URL"
+          code=$(curl -sS -o /tmp/resp.json -w "%{http_code}" "$URL" || true)
+          cat /tmp/resp.json || true
+          test "$code" = "200"
