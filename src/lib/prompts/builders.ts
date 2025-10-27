@@ -2,63 +2,55 @@ import type {
   ComposePromptResult,
   UpdatePlan,
   RestylePlan,
-  StyleDescriptor, // kept only for type compatibility in RestylePlan signature
-  Cluster,         // kept only for type compatibility in update/restyle plans
+  StyleDescriptor, // for RestylePlan signature
+  Cluster,         // for update/restyle plans
 } from "../types";
 
 type Strictness = "soft" | "medium" | "hard";
 
 export interface LockSpec {
   aspect?: "2:3";
-  camera?: "slight low angle, human eye-height";
-  composition?: "central vertical axis, tiered plinths";
-  balance?: "asymmetric balance around a central mass";
-  space?: "deep atmospheric perspective";
+  camera?: string;        // was a single literal; widen to string
+  composition?: string;   // widen to string
+  balance?: string;       // widen to string
+  space?: string;         // widen to string
   includeFrame?: boolean;
 }
 
 export interface OpenEndedSpec {
-  medium?: "oil on canvas" | "watercolor on paper" | "acrylic on canvas" | "pastel on paper" | "mixed media";
-  presentation?: "museum-grade";
-  styleNote?: "surrealist";
-  allowSymbolsHint?:
-    | "musical notes ok as abstract glyphs"
-    | "geometric shapes ok as abstract symbols"
-    | "literary references ok as abstract motifs"
-    | "historical figures ok as abstract symbols"
-    | "mythological figures ok as abstract symbols"
-    | "religious symbols ok as abstract symbols"
-    | "political symbols ok as abstract symbols"
-    | "cultural symbols ok as abstract symbols"
-    | "natural symbols ok as abstract symbols"
-    | "abstract symbols ok as abstract symbols";
+  medium?: string;        // e.g., "oil on canvas"
+  presentation?: string;  // e.g., "museum-grade"
+  styleNote?: string;     // e.g., "surrealist"
+  allowSymbolsHint?: string; // any short hint; keep it open
   negativeRules?: string[];
   strictness?: Strictness;
 }
+
+/** Build an open-ended prompt that locks structure & aspect, lets the model decide specifics. */
 export function buildOpenEndedPrompt(
   locks: LockSpec,
   open: OpenEndedSpec = {}
 ): string {
   const s = open.strictness ?? "medium";
   const reinforce =
-  s === "hard"
-    ? "These constraints are mandatory. Do not deviate."
-    : s === "medium"
-    ? "Prefer these constraints strongly."
-    : "Use these as guiding constraints.";
+    s === "hard"
+      ? "These constraints are mandatory. Do not deviate."
+      : s === "medium"
+      ? "Prefer these constraints strongly."
+      : "Use these as guiding constraints.";
 
   const negative = [
     "No text, numbers, letters, signage, logos, or flags with readable marks anywhere.",
     "No UI, charts, captions, or watermarks.",
     ...(open.negativeRules ?? []),
   ].join(" ");
-  
+
   return [
     // What the model is making
     `Create a museum-grade ${open.medium ?? "oil on canvas"} painting with an ornate frame inside the image.`,
     `${open.presentation ?? "Polished, fair-booth presentation; subtle impasto; rich surface."}`,
     `${open.styleNote ?? "Classical realism blended with contemporary symbolism."}`,
-    
+
     // HARD/SOFT locks: composition & camera/space
     `COMPOSITION LOCKS — ${reinforce}`,
     locks.composition ? `• Composition: ${locks.composition}.` : "",
@@ -81,6 +73,16 @@ export function buildOpenEndedPrompt(
     .filter(Boolean)
     .join(" ");
 }
+
+/** Adapter: return the shape your image pipeline expects */
+export function composeOpenEndedAsResult(prompt: string): ComposePromptResult {
+  return {
+    prompt,
+    negative_prompt:
+      "text, letters, numbers, signage, logos, flags with readable marks, UI, captions, watermarks, charts, diagrams",
+  };
+}
+
 export function buildAdditiveUpdatePlan(worldCluster: Cluster): UpdatePlan {
   const srcs = (worldCluster.items ?? []).map((i) => i.url).filter(Boolean).slice(0, 3);
   return {
