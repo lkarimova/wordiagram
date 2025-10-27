@@ -1,8 +1,15 @@
-import type OpenAI from "openai";
+import type {
+  ComposePromptResult,
+  UpdatePlan,
+  RestylePlan,
+  StyleDescriptor, // kept only for type compatibility in RestylePlan signature
+  Cluster,         // kept only for type compatibility in update/restyle plans
+} from "../types";
 
 type Strictness = "soft" | "medium" | "hard";
 
-interface LockSpec {
+export interface LockSpec {
+  aspect?: "2:3";
   camera?: "slight low angle, human eye-height";
   composition?: "central vertical axis, tiered plinths";
   balance?: "asymmetric balance around a central mass";
@@ -10,7 +17,7 @@ interface LockSpec {
   includeFrame?: boolean;
 }
 
-interface OpenEndedSpec {
+export interface OpenEndedSpec {
   medium?: "oil on canvas" | "watercolor on paper" | "acrylic on canvas" | "pastel on paper" | "mixed media";
   presentation?: "museum-grade";
   styleNote?: "surrealist";
@@ -63,7 +70,7 @@ export function buildOpenEndedPrompt(
 
     // Keep it open-ended
     "OPEN CHOICES — The model chooses subject matter, palette, motifs, era references, and lighting.",
-    "You may invent symbols and scenes freely as long as they fit the locked composition and perspective.",
+    "You may invent symbols and scenes freely as long as composition/perspective/space remain locked.",
 
     // Guardrails
     open.allowSymbolsHint
@@ -74,34 +81,30 @@ export function buildOpenEndedPrompt(
     .filter(Boolean)
     .join(" ");
 }
-
-type OpenAIImageSize =
-  | "auto"
-  | "1024x1024"
-  | "1536x1024"
-  | "1024x1536"   // 2:3 portrait
-  | "256x256"
-  | "512x512"
-  | "1792x1024"
-  | "1024x1792";
-
-export function size2x3(): OpenAIImageSize {
-  return "1024x1536";
+export function buildAdditiveUpdatePlan(worldCluster: Cluster): UpdatePlan {
+  const srcs = (worldCluster.items ?? []).map((i) => i.url).filter(Boolean).slice(0, 3);
+  return {
+    update_prompt:
+      `Add ONE small, readable symbol for "${worldCluster.title}" in the UPPER third; ` +
+      `harmonize palette; do NOT obscure the central axis or anchors; keep 2:3 aspect; ` +
+      `avoid any text or letters.`,
+    suggested_mask: undefined,
+    rationale: "Breaking world event — additive only; respect composition/perspective/space locks.",
+    sources: srcs,
+  };
 }
 
-export async function generateOpenEnded(
-  client: OpenAI,
-  prompt: string,
-  opts?: { size?: OpenAIImageSize; seed?: number; n?: number }
-) {
-  const res = await client.images.generate({
-    model: "gpt-image-1",
-    prompt,
-    size: opts?.size ?? size2x3(),
-    n: opts?.n ?? 1,
-    ...(opts?.seed ? { seed: opts.seed } : {}),
-  });
-  const data = res.data ?? [];
-  if (data.length === 0 || !data[0]?.b64_json) throw new Error("Image API returned no data");
-  return data.map(d => d.b64_json!).filter(Boolean);
+export function buildRestylePlan(
+  artCluster: Cluster,
+  prior: StyleDescriptor
+): RestylePlan {
+  const srcs = (artCluster.items ?? []).map((i) => i.url).filter(Boolean).slice(0, 3);
+  return {
+    restyle_prompt:
+      `Restyle with "${artCluster.title}" influence while preserving all content and the locked composition, perspective, and space; ` +
+      `maintain 2:3 aspect; avoid any text.`,
+    blend_details: "60% new influence, 40% prior",
+    rationale: "Art-world style update without altering structure.",
+    sources: srcs,
+  };
 }
