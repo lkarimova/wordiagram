@@ -33,9 +33,9 @@ export function buildStyleDescriptor(
 ): StyleDescriptor {
   const base: StyleDescriptor = {
     descriptor:
-      "post-digital painterly minimalism with impasto texture and archival grain",
-    palette: ["#4b6cc1", "#e2c290", "#1a1a1a", "#f2efe9"],
-    references: ["color-field", "brutalist layout"],
+      "scenic genre painting with impasto texture and archival grain",
+    palette: ["#4b6cc1", "#e2c290", "#1a1a1a", "#f2efe9", "#dc143c", "#ff8c42", "#ffd700", "#ff6b6b", "#0047ab", "#50c878", "#7851a9", "#40e0d0", "#ff00ff", "#32cd32", "#ff69b4", "#ff4500"],
+    references: ["metaphorical landscapes", "abstract scenes", "surrealist compositions"],
   };
 
   if (!prior) return base;
