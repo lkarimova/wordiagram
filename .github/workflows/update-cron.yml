@@ -1,37 +1,20 @@
-name: Scheduled Update (ping /api/update)
 on:
   schedule:
     - cron: "0 */4 * * *"
-  workflow_dispatch:
-permissions:
-  contents: read
-concurrency:
-  group: update-cron
-  cancel-in-progress: false
 jobs:
   ping-update-endpoint:
+    environment: Production
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     steps:
       - name: Call /api/update on Production
         env:
           SITE_URL: https://www.wordiagram.com
-          TOKEN: ${{ secrets.UPDATE_TOKEN }}
+          BASIC_USER: ${{ secrets.BASIC_AUTH_USER }}
+          BASIC_PASS: ${{ secrets.BASIC_AUTH_PASS }}
         run: |
           set -euo pipefail
-          URL="${SITE_URL}/api/update?kind=both&token=${TOKEN}"
-          echo "Pinging: $URL"
-          for i in 1 2 3; do
-            HTTP_STATUS=$(curl -sS -o /tmp/resp.json -w "%{http_code}" \
-              --max-time 30 --retry 2 --retry-delay 5 "$URL" || true)
-            echo "HTTP status: $HTTP_STATUS"
-            cat /tmp/resp.json || true
-            if [ "$HTTP_STATUS" = "200" ]; then
-              echo "Success."
-              exit 0
-            fi
-            echo "Attempt $i failed; retrying..."
-            sleep 10
-          done
-          echo "Failed to reach ${URL} successfully after retries."
-          exit 1
+          curl -sS -X POST "$SITE_URL/api/update" \
+            -u "$BASIC_USER:$BASIC_PASS" \
+            -H "Content-Type: application/json" \
+            --data '{"kind":"both"}' \
+            -w "\nHTTP %{http_code}\n"
