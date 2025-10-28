@@ -51,7 +51,6 @@ export async function runDailyGeneration() {
     `• Today’s art-world context: ${artHard}.`,
     `Do not depict written words, numbers, or logos. Do not include flags with readable marks.`,
     `You must reflect these themes, but the specific subjects, palette, era references, and symbols are up to you.`,
-    `If a listed theme cannot be represented without text, use a culturally neutral symbolic substitute.`
   ].join('\n');
 
   const openEndedPrompt = `${basePrompt}\n${hardContext}`;

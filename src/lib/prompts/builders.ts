@@ -18,10 +18,10 @@ export interface LockSpec {
 }
 
 export interface OpenEndedSpec {
-  medium?: string;        // e.g., "oil on canvas"
-  presentation?: string;  // e.g., "museum-grade"
-  styleNote?: string;     // e.g., "surrealist"
-  allowSymbolsHint?: string; // any short hint; keep it open
+  medium?: "oil on canvas";        // e.g., "oil on canvas"
+  presentation?: "museum-grade";  // e.g., "museum-grade"
+  styleNote?: "surrealist";     // e.g., "surrealist"
+  allowSymbolsHint?: "interpret world news and art news as symbols and scenes"; // any short hint; keep it open
   negativeRules?: string[];
   strictness?: Strictness;
 }
@@ -40,7 +40,7 @@ export function buildOpenEndedPrompt(
       : "Use these as guiding constraints.";
 
   const negative = [
-    "No text, numbers, letters, signage, logos, or flags with readable marks anywhere.",
+    "No text anywhere.",
     "No UI, charts, captions, or watermarks.",
     ...(open.negativeRules ?? []),
   ].join(" ");
@@ -49,7 +49,7 @@ export function buildOpenEndedPrompt(
     // What the model is making
     `Create a museum-grade ${open.medium ?? "oil on canvas"} painting with an ornate frame inside the image.`,
     `${open.presentation ?? "Polished, fair-booth presentation; subtle impasto; rich surface."}`,
-    `${open.styleNote ?? "Classical realism blended with contemporary symbolism."}`,
+    `${open.styleNote ?? "Classical realism blended with contemporary symbolism and surrealism."}`,
 
     // HARD/SOFT locks: composition & camera/space
     `COMPOSITION LOCKS — ${reinforce}`,
@@ -62,12 +62,12 @@ export function buildOpenEndedPrompt(
 
     // Keep it open-ended
     "OPEN CHOICES — The model chooses subject matter, palette, motifs, era references, and lighting.",
-    "You may invent symbols and scenes freely as long as composition/perspective/space remain locked.",
+    "You may choose symbols and scenes freely as long as composition/perspective/space remain locked.",
 
     // Guardrails
     open.allowSymbolsHint
       ? `Symbolic glyphs allowed: ${open.allowSymbolsHint} (abstract only; no letters).`
-      : "Symbolic glyphs like musical notes are allowed as abstract shapes; avoid any letters.",
+      : "Symbolic glyph are allowed as abstract shapes; avoid any letters.",
     negative,
   ]
     .filter(Boolean)
@@ -79,7 +79,7 @@ export function composeOpenEndedAsResult(prompt: string): ComposePromptResult {
   return {
     prompt,
     negative_prompt:
-      "text, letters, numbers, signage, logos, flags with readable marks, UI, captions, watermarks, charts, diagrams",
+      "text, UI, captions, watermarks, charts, diagrams",
   };
 }
 
@@ -87,7 +87,7 @@ export function buildAdditiveUpdatePlan(worldCluster: Cluster): UpdatePlan {
   const srcs = (worldCluster.items ?? []).map((i) => i.url).filter(Boolean).slice(0, 3);
   return {
     update_prompt:
-      `Add ONE small, readable symbol for "${worldCluster.title}" in the UPPER third; ` +
+      `Add ONE large, readable symbol for "${worldCluster.title}" in the UPPER third; ` +
       `harmonize palette; do NOT obscure the central axis or anchors; keep 2:3 aspect; ` +
       `avoid any text or letters.`,
     suggested_mask: undefined,
@@ -105,7 +105,7 @@ export function buildRestylePlan(
     restyle_prompt:
       `Restyle with "${artCluster.title}" influence while preserving all content and the locked composition, perspective, and space; ` +
       `maintain 2:3 aspect; avoid any text.`,
-    blend_details: "60% new influence, 40% prior",
+    blend_details: "80% new influence, 20% prior",
     rationale: "Art-world style update without altering structure.",
     sources: srcs,
   };
