@@ -76,6 +76,7 @@ export async function runDailyGeneration() {
     composer: {
       basePrompt,
       hardContext,
+      openEndedPrompt,
       finalPrompt,
       negative_prompt,
     },
