@@ -2,12 +2,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
   return (
     <div
       className="relative mx-auto"
-      style={{
-        aspectRatio: "2 / 3",
-        // Width is limited by either viewport width (vw) or viewport height (vh * 2/3)
-        // so the resulting height never exceeds ~80vh and it never overflows width.
-        width: "min(80vw, calc(80vh * 3 / 4))",
-      }}
+      style={{ aspectRatio: "2 / 3", maxWidth: 768 }}
     >
       <svg
         className="pointer-events-none absolute inset-0 w-full h-full"

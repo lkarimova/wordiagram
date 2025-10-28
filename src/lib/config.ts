@@ -8,7 +8,7 @@ export const config = (() => {
       dailyHourLocal: 6,
       scanEveryHours: 4,
     },
-    aspect: { width: 1536, height: 2048 },
+    aspect: { width: 1536, height: 2304 },
     news: {
       worldSources: (env.NEWS_SOURCES_WORLD || '').split(',').map(s => s.trim()).filter(Boolean),
       artSources: (env.NEWS_SOURCES_ART || '').split(',').map(s => s.trim()).filter(Boolean),

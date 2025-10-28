@@ -69,6 +69,32 @@ export async function runDailyGeneration() {
 
   const imgUrl = await savePngToStorage(`${dateStr}/base.png`, image);
 
+  // 5) Build debug payload (what your pipeline actually used)
+  const debug = {
+    date: dateStr,
+    aspect: `${config.aspect.width}x${config.aspect.height}`,
+    composer: {
+      basePrompt,
+      hardContext,
+      finalPrompt,
+      negative_prompt,
+    },
+    newsSelected: {
+      world: world.slice(0, 20).map(i => ({ title: i.title, url: i.url })),
+      art: art.slice(0, 20).map(i => ({ title: i.title, url: i.url })),
+    },
+    clustersPicked: {
+      world: worldClusters.slice(0, 6).map(c => ({ title: c.title })),
+      art: artClusters.slice(0, 4).map(c => ({ title: c.title })),
+    },
+    generatedAt: new Date().toISOString(),
+  };
+
+  // Helpful logs in Vercel → Functions logs (/api/generate)
+  console.log('[generate] themes world:', worldHard);
+  console.log('[generate] themes art  :', artHard);
+  console.log('[generate] prompt      :', finalPrompt);
+
   // 5) Persist metadata
   const world_theme_summary = worldClusters.map(t => t.title).slice(0, 6).join(', ');
   const art_style_summary   = artClusters.map(t => t.title).slice(0, 6).join(', ');
@@ -85,8 +111,8 @@ export async function runDailyGeneration() {
     },
     world_theme_summary,
     art_style_summary,
-    model_info: { model: 'gpt-image-1', aspect: config.aspect },
-    sources: { world: world.map(i => i.url), art: art.map(i => i.url) },
+    model_info: { model: 'gpt-image-1', aspect: config.aspect, debug },
+    sources: { world: world.map(i => ({ title: i.title, url: i.url })), art: art.map(i => ({ title: i.title, url: i.url })) },
   } as any);
 
   return row;
