@@ -1,64 +1,83 @@
 // src/lib/image/providers/openai.ts
-import OpenAI from "openai";
+import OpenAI, { toFile } from "openai";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 type GenOpts = { prompt: string; width: number; height: number };
+type EditOpts = {
+  baseImage: Uint8Array;
+  maskImage: Uint8Array; // white = editable, black = protected
+  prompt: string;
+  width: number;
+  height: number;
+};
+
+// Allowed sizes: remove "1536x2048"
 type AllowedSize =
-  | "auto"
   | "256x256"
   | "512x512"
   | "1024x1024"
-  | "1536x1024"
   | "1024x1536"
-  | "1792x1024"
-  | "1024x1792";
+  | "1536x1024"
+  | "1024x1792"
+  | "1792x1024";
 
+// Map to supported sizes (portrait 2:3 → 1024x1536; landscape → 1536x1024)
 function toAllowedSize(w: number, h: number): AllowedSize {
-  if (h > w) return "1024x1536";           // portrait (close to 3:4)
-  if (w > h) return "1536x1024";           // landscape
-  return "1024x1024";                      // square fallback
+  return h >= w ? "1024x1536" : "1536x1024";
 }
 
 async function fetchToBytes(url: string): Promise<Uint8Array> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`fetch image failed: ${res.status}`);
-  const buf = await res.arrayBuffer();
-  return new Uint8Array(buf);
+  return new Uint8Array(await res.arrayBuffer());
 }
 
+/** ----- Base generation (keeps your b64/url flexibility) ----- */
 async function generatePng(opts: GenOpts): Promise<Uint8Array> {
   const size = toAllowedSize(opts.width, opts.height);
 
   const res = await client.images.generate({
     model: "gpt-image-1",
     prompt: opts.prompt,
-    background: "transparent",
-    quality: "medium",
-    size,                 // ← remove response_format; let SDK choose
-    // optional: background: "transparent", quality: "medium",
+    size,
+    // you can keep these if you like; remove if you hit API errors:
+    // background: "transparent",
+    // quality: "medium",
+    response_format: "b64_json", // prefer b64 for consistency
   });
 
   const item = res.data?.[0];
   if (!item) throw new Error("OpenAI Images returned empty data");
 
-  // Handle either base64 or URL responses
-  if (item.b64_json) {
-    return Uint8Array.from(Buffer.from(item.b64_json, "base64"));
-  }
-  if (item.url) {
-    return fetchToBytes(item.url);
-  }
+  if (item.b64_json) return Uint8Array.from(Buffer.from(item.b64_json, "base64"));
+  if (item.url) return fetchToBytes(item.url);
   throw new Error("Images response missing b64_json and url");
 }
 
-// Public API used elsewhere
+/** Public API used elsewhere */
 export async function generateBaseImage(opts: { prompt: string; width: number; height: number }) {
   return generatePng(opts);
 }
-export async function inpaintOrOverlay(opts: { base: Uint8Array; prompt: string; mask?: Uint8Array }) {
-  return generatePng({ prompt: opts.prompt, width: 1024, height: 1536 });
-}
-export async function restyle(opts: { base: Uint8Array; prompt: string }) {
-  return generatePng({ prompt: opts.prompt, width: 1024, height: 1536 });
+
+/** ----- Masked edit: preserves all pixels outside white mask ----- */
+export async function editImageWithMask(opts: EditOpts): Promise<Uint8Array> {
+  const size = toAllowedSize(opts.width, opts.height);
+
+  const res = await client.images.edits({
+    model: "gpt-image-1",
+    // IMPORTANT: first image is the base; mask is separate
+    image: [await toFile(Buffer.from(opts.baseImage), "base.png")], // base first
+    mask: await toFile(Buffer.from(opts.maskImage), "mask.png"),    // white = editable
+    prompt: opts.prompt,
+    size,                                  // e.g. "1024x1536"
+    response_format: "b64_json",
+  });
+
+  const item = res.data?.[0];
+  if (!item) throw new Error("OpenAI Image edit returned empty data");
+
+  if (item.b64_json) return Uint8Array.from(Buffer.from(item.b64_json, "base64"));
+  if (item.url) return fetchToBytes(item.url);
+  throw new Error("Images edit response missing b64_json and url");
 }

@@ -141,11 +141,11 @@ export function buildAdditiveUpdatePlan(worldCluster: Cluster): UpdatePlan {
   const srcs = (worldCluster.items ?? []).map((i) => i.url).filter(Boolean).slice(0, 3);
   return {
     update_prompt:
-      `Add ONE large, readable symbol for "${worldCluster.title}" in the UPPER third; ` +
-      `harmonize palette; do NOT obscure the central axis or anchors; keep 2:3 aspect; ` +
-      `avoid any text or letters.`,
+     `Inside the PROVIDED MASKED AREA ONLY, add ONE clear, readable symbol for "${worldCluster.title}". ` +
+     `Do NOT modify or restyle any pixels outside the mask. Preserve all existing content, palette, and composition. ` +
+     `No text or letters.`,
     suggested_mask: undefined,
-    rationale: "Breaking world event — additive only; respect composition/perspective/space locks.",
+    rationale: "Breaking world event — additive only; masked edit; preserve scene.",
     sources: srcs,
   };
 }
