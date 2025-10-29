@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import Image from 'next/image';
 import { listArchive } from "@/src/server/supabase";
@@ -5,7 +6,7 @@ import { formatInTimeZone } from "date-fns-tz";
 const TZ = "America/New_York";
 
 export default async function ArchivePage() {
-  const items = await listArchive(60);
+  const items = await listArchive(90);
   const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
   const pastOnly = items.filter(i => i.date !== today);
   return (
@@ -21,6 +22,8 @@ export default async function ArchivePage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {items.map((p) => {
             const url = p.final_image_url || p.base_image_url;
+            const src = p.final_image_url || p.base_image_url;
+            const bust = `${src}${src.includes("?") ? "&" : "?"}v=${encodeURIComponent(p.id)}`;
             return (
               <Link key={p.id} href={`/painting/${p.date}`} className="block">
                 <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
