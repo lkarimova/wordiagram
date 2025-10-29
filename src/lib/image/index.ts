@@ -22,22 +22,13 @@ async function makeRectMask(
   height: number,
   rect: { x: number; y: number; w: number; h: number }
 ): Promise<Uint8Array> {
-  const base = sharp({
-    create: { width, height, channels: 1, background: { r: 0, g: 0, b: 0, alpha: 1 } },
-  });
-
-  const overlay = await sharp({
-    create: { width: rect.w, height: rect.h, channels: 1, background: { r: 255, g: 255, b: 255, alpha: 1 } },
-  })
-    .png()
-    .toBuffer();
-
-  const buf = await base
-    .composite([{ input: overlay, left: rect.x, top: rect.y }])
-    .png()
-    .toBuffer();
-
-  return new Uint8Array(buf);
+  const svg = `
+  <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="${width}" height="${height}" fill="black"/>
+    <rect x="${rect.x}" y="${rect.y}" width="${rect.w}" height="${rect.h}" fill="white"/>
+  </svg>`;
+const buf = await sharp(Buffer.from(svg)).png().toBuffer();
+return new Uint8Array(buf);
 }
 
 /**
