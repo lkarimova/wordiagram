@@ -15,7 +15,7 @@ export default async function Home() {
   const tz = 'ET';
   return (
     <main className="min-h-screen bg-white text-black">
-      <div className="max-w-5xl mx-auto px-4 py-10 flex flex-col items-center gap-6">
+      <div className="mx-auto px-4 py-10 flex flex-col items-center gap-6">
         <Frame>
           {url ? (
             <Image 
@@ -23,7 +23,7 @@ export default async function Home() {
               alt="World-News Painting"
               fill
               style={{ objectFit: "cover" }}
-              unoptimized
+              sizes="(max-width: 1024px) 90vw, 60vw"
               priority
             />
           ) : (
