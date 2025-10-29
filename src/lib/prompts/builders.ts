@@ -8,6 +8,53 @@ import type {
 
 type Strictness = "soft" | "medium" | "hard";
 
+type StyleSpec = {
+  medium: string;          // e.g., "oil on canvas"
+  texture: string;         // e.g., "impasto brushwork" | "paper grain"
+  palette: string[];       // array of HEX strings
+  descriptor: string;      // one-line style phrase
+};
+
+const STYLE_RULES = [
+  { k: /watercolor|aquarelle/i,  medium: "watercolor on cotton paper", texture: "paper grain, wet-into-wet blooms",
+    palette: ["#274060","#5983B0","#D9E4EC","#F2D6B3","#BF8C60"], descriptor: "delicate watercolor with atmospheric washes" },
+  { k: /pastel|chalk/i,          medium: "soft pastel on toned paper", texture: "chalky strokes, toothy paper",
+    palette: ["#0D1B2A","#1B263B","#415A77","#E0E1DD","#E07A5F"], descriptor: "soft pastel with velvety gradients" },
+  { k: /acrylic|contemporary/i,  medium: "acrylic on panel", texture: "flat coats with subtle brush chatter",
+    palette: ["#0F0F0F","#2E86AB","#F6C667","#F4F4F4","#D94F04"], descriptor: "contemporary acrylic with clean edges" },
+  { k: /collage|mixed|cut-out/i, medium: "paper collage", texture: "layered cut paper, deckled edges",
+    palette: ["#1B1B1B","#F2E8CF","#BB4430","#7EBDC3","#F3DFA2"], descriptor: "paper collage with layered cutouts" },
+  { k: /ink|line|drawing/i,      medium: "ink drawing on hot-press paper", texture: "linework, light hatching",
+    palette: ["#101010","#2B2B2B","#6B6B6B","#BFBFBF","#F5F5F5"], descriptor: "ink drawing with graphic clarity" },
+  { k: /charcoal|graphite/i,     medium: "charcoal on toned paper", texture: "smudged charcoal, matte tooth",
+    palette: ["#0A0A0A","#3A3A3A","#6D6D6D","#A9A9A9","#EAEAEA"], descriptor: "charcoal study with tonal masses" },
+  { k: /textile|fiber|weave/i,   medium: "textile collage", texture: "stitched fabric, woven textures",
+    palette: ["#372F2F","#73683B","#CABFAB","#7B9EA8","#C97064"], descriptor: "textile collage with stitched seams" },
+  { k: /photo|photography/i,     medium: "photo-collage on panel", texture: "print grain, matte varnish",
+    palette: ["#121212","#3C3C3C","#8C8C8C","#DADADA","#F2F2F2"], descriptor: "photo-collage with tonal balance" },
+  { k: /digital|ai|generative/i, medium: "digital painting (archival print)", texture: "smooth gradient ramps, dither grain",
+    palette: ["#121420","#3F88C5","#F49D37","#E94F37","#EDE7E3"], descriptor: "post-digital painterly minimalism" },
+  // default oil
+  { k: /.*/,                     medium: "oil on canvas", texture: "impasto brushwork, archival grain",
+    palette: ["#1A1A1A","#4B6CC1","#E2C290","#F2EFE9","#7A5C3E"], descriptor: "oil painting with tactile impasto" },
+];
+
+export function deriveArtStyleFromClusters(artClusters: Cluster[]): StyleSpec {
+  const titleBlob = (artClusters || []).map(c => c.title).join(" | ");
+  const rule = STYLE_RULES.find(r => r.k.test(titleBlob)) || STYLE_RULES[STYLE_RULES.length - 1];
+  return { medium: rule.medium, texture: rule.texture, palette: rule.palette, descriptor: rule.descriptor };
+}
+
+export function styleBlock(spec: StyleSpec): string {
+  const pal = spec.palette.join(", ");
+  return [
+    `Medium: ${spec.medium}.`,
+    `Surface/Texture: ${spec.texture}.`,
+    `Palette (hex): ${pal}.`,
+    `Overall Descriptor: ${spec.descriptor}.`,
+  ].join(" ");
+}
+
 export interface LockSpec {
   aspect?: "2:3";
   camera?: string;        // was a single literal; widen to string

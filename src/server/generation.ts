@@ -9,6 +9,8 @@ import {
 import {
   buildOpenEndedPrompt,
   composeOpenEndedAsResult,
+  deriveArtStyleFromClusters,
+  styleBlock,
 } from "@/lib/prompts/builders";
 import { generateDailyBase } from "@/lib/image";
 import { savePngToStorage } from "@/lib/storage";
@@ -43,6 +45,7 @@ export async function runDailyGeneration() {
 
   const worldClusters = rankAndCluster(world);
   const artClusters = rankAndCluster(art);
+  const artStyle = deriveArtStyleFromClusters(artClusters);
 
   // 2) Base prompt: locks structure; leaves visuals open-ended
   const basePrompt = buildOpenEndedPrompt(
@@ -72,7 +75,8 @@ export async function runDailyGeneration() {
     `Reflect these themes through symbolic scenes and objects; exact subjects/palette are up to you.`,
   ].join("\n");
 
-  const openEndedPrompt = `${basePrompt}\n${hardContext}`;
+  const styleLines = `STYLE INFLUENCE — ${styleBlock(artStyle)}`;
+  const openEndedPrompt = `${basePrompt}\n${hardContext}\n${styleLines}`;
 
   // 4) Convert to the { prompt, negative_prompt } your image fn expects
   const { prompt: finalPrompt, negative_prompt } =
@@ -136,13 +140,13 @@ export async function runDailyGeneration() {
     final_image_url: imgUrl,
     prompt: { prompt: finalPrompt, negative_prompt },
     style_descriptor: {
-      descriptor: "open-ended; model chooses style (hard news/art context)",
-      palette: [],
+      descriptor: artStyle.descriptor,
+      palette: artStyle.palette,
       references: [],
     },
     world_theme_summary,
     art_style_summary,
-    model_info: { model: "gpt-image-1", aspect: config.aspect, debug },
+    model_info: { model: "gpt-image-1", aspect: config.aspect, debug, artStyleChosen: artStyle },
     // Save real sources for private inspection
     sources: {
       world: world.slice(0, 20).map(i => ({
