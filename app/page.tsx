@@ -49,13 +49,15 @@ export default async function Home() {
           )
           </Frame>
         {stamp ? (
-          <p className="text-sm text-neutral-700">{stamp}</p>
-        ) : null}
-        <div className="flex gap-3">
-          <Link href="/archive" className="px-4 py-2 bg-black text-white rounded">
-            Archive
+          <p className="text-sm text-neutral-700">{stamp}{" "}
+          <Link
+            href="/archive"
+            className="underline underline-offset-2 decoration-current hover:opacity-80"
+          >
+            View Archive
           </Link>
-        </div>
+        </p>
+        ) : null}
       </div>
     </main>
   );
