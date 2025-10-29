@@ -1,6 +1,5 @@
 // src/lib/image/providers/openai.ts
-import OpenAI, { toFile } from "openai";
-
+import OpenAI from "openai";
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 
 type GenOpts = { prompt: string; width: number; height: number };
@@ -20,11 +19,14 @@ type AllowedSize =
   | "1024x1536"
   | "1536x1024"
   | "1024x1792"
-  | "1792x1024";
+  | "1792x1024"
+  | "1536x2048";
 
 // Map to supported sizes (portrait 2:3 → 1024x1536; landscape → 1536x1024)
 function toAllowedSize(w: number, h: number): AllowedSize {
-  return h >= w ? "1024x1536" : "1536x1024";
+  if (w === 1536 && h === 2048) return "1536x2048";
+  if (h >= w) return "1024x1536";
+  return "1536x1024";
 }
 
 async function fetchToBytes(url: string): Promise<Uint8Array> {
@@ -64,20 +66,37 @@ export async function generateBaseImage(opts: { prompt: string; width: number; h
 export async function editImageWithMask(opts: EditOpts): Promise<Uint8Array> {
   const size = toAllowedSize(opts.width, opts.height);
 
-  const res = await client.images.edits({
+  // Common payload — most SDK versions accept Buffer directly
+  const payload: any = {
     model: "gpt-image-1",
-    // IMPORTANT: first image is the base; mask is separate
-    image: [await toFile(Buffer.from(opts.baseImage), "base.png")], // base first
-    mask: await toFile(Buffer.from(opts.maskImage), "mask.png"),    // white = editable
+    image: [Buffer.from(opts.baseImage)], // base first
+    mask: Buffer.from(opts.maskImage),    // white = editable
     prompt: opts.prompt,
-    size,                                  // e.g. "1024x1536"
+    size,
     response_format: "b64_json",
-  });
+  };
 
-  const item = res.data?.[0];
-  if (!item) throw new Error("OpenAI Image edit returned empty data");
+  let res: any;
+  const api = (client as any).images;
+
+  if (typeof api.edits === "function") {
+    // Newer SDKs
+    res = await api.edits(payload);
+  } else if (typeof api.edit === "function") {
+    // Older SDKs
+    res = await api.edit(payload);
+  } else {
+    throw new Error("This OpenAI SDK version has neither images.edits nor images.edit");
+  }
+
+  const item = res?.data?.[0];
+  if (!item) throw new Error("OpenAI image edit returned empty data");
 
   if (item.b64_json) return Uint8Array.from(Buffer.from(item.b64_json, "base64"));
-  if (item.url) return fetchToBytes(item.url);
-  throw new Error("Images edit response missing b64_json and url");
+  if (item.url) {
+    const r = await fetch(item.url);
+    if (!r.ok) throw new Error(`fetch edited image failed: ${r.status}`);
+    return new Uint8Array(await r.arrayBuffer());
+  }
+  throw new Error("Image edit response missing b64_json and url");
 }
