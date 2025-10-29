@@ -19,11 +19,16 @@ function todayInTimezone(): string {
   return formatInTimeZone(now, config.timezone, "yyyy-MM-dd");
 }
 
-function topTitles(items: { title: string }[], n: number): string {
-  const pick = items.slice(0, n).map(i => (i.title || "").trim()).filter(Boolean);
-  return pick
-    .map(t => (t.length > 110 ? t.slice(0, 107) + "…" : t))
-    .join(" ; ");
+function listHeadlines(items: { title: string; source?: string }[], n: number) {
+  return items
+    .slice(0, n)
+    .map(i => {
+      const title = (i.title || "").trim();
+      const source = (i.source || "").trim();
+      const t = title.length > 140 ? title.slice(0, 137) + "…" : title;
+      return source ? `${t} — ${source}` : t;
+    })
+    .join(" · "); // you can use "\n• " if you want new lines in DB text
 }
 
 export async function runDailyGeneration() {
@@ -44,7 +49,7 @@ export async function runDailyGeneration() {
     {
       aspect: "2:3",
       includeFrame: true,
-      composition: "central vertical axis; tiered plinths",
+      composition: "central vertical axis; naturalistic layering",
       balance: "asymmetric balance around a central mass",
       camera: "slight low angle, human eye height",
       space: "deep atmospheric perspective",
@@ -56,15 +61,15 @@ export async function runDailyGeneration() {
   );
 
   // 3) HARD CONTEXT from concrete story titles (not generic labels)
-  const worldHard = topTitles(world, 4);
-  const artHard = topTitles(art, 3);
+  const worldList = listHeadlines(world, 5);
+  const artList = listHeadlines(art, 4);
 
   const hardContext = [
-    `HARD CONTEXT — These themes must be interpreted in the image (no text):`,
-    `• Today’s world headlines (${dateStr}): ${worldHard || "—"}.`,
-    `• Today’s art-world context: ${artHard || "—"}.`,
-    `Do not depict written words, numbers, or logos. Do not include flags with readable marks.`,
-    `You must reflect these themes, but the specific subjects, palette, era references, and symbols are up to you.`,
+    `HARD CONTEXT — Interpret these headlines **visually** (no text glyphs in the image):`,
+    `• World (${dateStr}): ${worldList || "—"}.`,
+    `• Art: ${artList || "—"}.`,
+    `No words, numbers, or logos. No flags with readable marks.`,
+    `Reflect these themes through symbolic scenes and objects; exact subjects/palette are up to you.`,
   ].join("\n");
 
   const openEndedPrompt = `${basePrompt}\n${hardContext}`;
@@ -97,23 +102,23 @@ export async function runDailyGeneration() {
       negative_prompt,
     },
     newsSelected: {
-      world: world.slice(0, 12).map(i => ({
+      world: world.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,
       })),
-      art: art.slice(0, 12).map(i => ({
+      art: art.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,
       })),
     },
     clustersPicked: {
-      world: worldClusters.slice(0, 4).map(c => ({
+      world: worldClusters.slice(0, 5).map(c => ({
         title: c.title,
         size: c.items.length,
       })),
-      art: artClusters.slice(0, 4).map(c => ({
+      art: artClusters.slice(0, 5).map(c => ({
         title: c.title,
         size: c.items.length,
       })),
@@ -122,8 +127,8 @@ export async function runDailyGeneration() {
   };
 
   // Specific, human-readable summaries (titles, not labels)
-  const world_theme_summary = worldHard || "(no world items)";
-  const art_style_summary = artHard || "(no art items)";
+  const world_theme_summary = worldList || "(no world items)";
+  const art_style_summary = artList || "(no art items)";
 
   const row = await insertDailyPainting({
     date: dateStr,

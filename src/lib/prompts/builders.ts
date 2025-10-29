@@ -18,18 +18,25 @@ export interface LockSpec {
 }
 
 export interface OpenEndedSpec {
-  medium?: "oil on canvas";        // e.g., "oil on canvas"
-  presentation?: "museum-grade";  // e.g., "museum-grade"
-  styleNote?: "surrealist";     // e.g., "surrealist"
-  allowSymbolsHint?: "interpret world news and art news as symbols and scenes"; // any short hint; keep it open
-  negativeRules?: string[];
-  strictness?: Strictness;
+  medium?:  
+  | "oil on canvas"
+  | "acrylic on canvas"
+  | "watercolor on paper"
+  | "pastel on paper"
+  | "ink on paper"
+  | "mixed media"
+  | (string & {});        // e.g., "oil on canvas"
+  presentation?: "museum-grade" | "gallery" | "studio" | (string & {});  // e.g., "museum-grade"
+  styleNote?: string;     // e.g., "surrealist"
+  allowSymbolsHint?: string;
+  negativeRules?: ["No text, UI, charts, captions, or watermarks."];
+  strictness: "hard";
 }
 
 /** Build an open-ended prompt that locks structure & aspect, lets the model decide specifics. */
 export function buildOpenEndedPrompt(
   locks: LockSpec,
-  open: OpenEndedSpec = {}
+  open: OpenEndedSpec = {strictness: "hard"}
 ): string {
   const s = open.strictness ?? "medium";
   const reinforce =
