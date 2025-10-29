@@ -36,8 +36,8 @@ export async function runDailyGeneration() {
   console.log("[generate] world count:", world.length);
   console.log("[generate] art count  :", art.length);
 
-  const worldClusters = rankAndCluster(world, "world");
-  const artClusters = rankAndCluster(art, "art");
+  const worldClusters = rankAndCluster(world);
+  const artClusters = rankAndCluster(art);
 
   // 2) Base prompt: locks structure; leaves visuals open-ended
   const basePrompt = buildOpenEndedPrompt(
