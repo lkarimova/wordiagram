@@ -49,7 +49,7 @@ export default async function Home() {
           )
           </Frame>
         {stamp ? (
-          <p className="text-sm text-neutral-700">{stamp}{" "}
+          <p className="text-sm text-neutral-700">{stamp}•{" "}
           <Link
             href="/archive"
             className="underline underline-offset-2 decoration-current hover:opacity-80"
