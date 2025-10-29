@@ -56,7 +56,7 @@ export function buildOpenEndedPrompt(
     // What the model is making
     `Create a museum-grade ${open.medium ?? "oil on canvas"} painting with an ornate frame inside the image.`,
     `${open.presentation ?? "Polished, fair-booth presentation; subtle impasto; rich surface."}`,
-    `${open.styleNote ?? "Classical realism blended with contemporary symbolism and surrealism."}`,
+    `${open.styleNote ?? "Classical realism blended with contemporary symbolism."}`,
 
     // HARD/SOFT locks: composition & camera/space
     `COMPOSITION LOCKS — ${reinforce}`,

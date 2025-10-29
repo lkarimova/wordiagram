@@ -49,7 +49,7 @@ export async function runDailyGeneration() {
     {
       aspect: "2:3",
       includeFrame: true,
-      composition: "central vertical axis; naturalistic layering",
+      composition: "central vertical axis; layered composition",
       balance: "asymmetric balance around a central mass",
       camera: "slight low angle, human eye height",
       space: "deep atmospheric perspective",
