@@ -58,6 +58,20 @@ export async function getLatestDaily() {
   return data as DailyPainting | null;
 }
 
+// Get most recent update for a given daily painting
+export async function getLatestUpdateForDaily(dailyId: string) {
+  const client = svc();
+  const { data, error } = await client
+    .from('painting_updates')
+    .select('id, created_at')
+    .eq('daily_id', dailyId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw error;
+  return data as { id: string; created_at: string } | null;
+}
+
 export async function getDailyByDate(date: string) {
   const { data, error } = await anon()
     .from("daily_paintings")
