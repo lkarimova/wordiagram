@@ -19,14 +19,11 @@ type AllowedSize =
   | "1024x1536"
   | "1536x1024"
   | "1024x1792"
-  | "1792x1024"
-  | "1536x2048";
+  | "1792x1024";
 
-// Map to supported sizes (portrait 2:3 → 1024x1536; landscape → 1536x1024)
-function toAllowedSize(w: number, h: number): AllowedSize {
-  if (w === 1536 && h === 2048) return "1536x2048";
-  if (h >= w) return "1024x1536";
-  return "1536x1024";
+// Portrait-only mapper: always return a portrait size
+function toAllowedSize(_w: number, _h: number): AllowedSize {
+  return "1024x1536"; // lock to portrait 2:3-ish
 }
 
 async function fetchToBytes(url: string): Promise<Uint8Array> {
@@ -37,8 +34,8 @@ async function fetchToBytes(url: string): Promise<Uint8Array> {
 
 /** ----- Base generation (keeps your b64/url flexibility) ----- */
 async function generatePng(opts: GenOpts): Promise<Uint8Array> {
-  const size = toAllowedSize(opts.width, opts.height);
-
+  const size: AllowedSize = toAllowedSize(opts.width, opts.height);
+  
   const res = await client.images.generate({
     model: "gpt-image-1",
     prompt: opts.prompt,
@@ -64,7 +61,7 @@ export async function generateBaseImage(opts: { prompt: string; width: number; h
 
 /** ----- Masked edit: preserves all pixels outside white mask ----- */
 export async function editImageWithMask(opts: EditOpts): Promise<Uint8Array> {
-  const size = toAllowedSize(opts.width, opts.height);
+  const size: AllowedSize = toAllowedSize(opts.width, opts.height);
 
   // Common payload — most SDK versions accept Buffer directly
   const payload: any = {

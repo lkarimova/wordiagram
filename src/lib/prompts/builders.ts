@@ -113,6 +113,7 @@ export function buildOpenEndedPrompt(
     locks.space ? `• Space/Depth: ${locks.space}.` : "",
     locks.includeFrame === false ? "• Exclude frame." : "• Include the frame as part of the composition.",
     "• Target aspect ratio 2:3 (vertical). Maintain this geometry.",
+    "• Orientation: portrait only; do not compose as landscape.",
 
     // Keep it open-ended
     "OPEN CHOICES — The model chooses subject matter, palette, motifs, era references, and lighting.",
