@@ -71,7 +71,7 @@ export async function runDailyGeneration() {
     `HARD CONTEXT — Interpret these headlines **visually** (no text glyphs in the image):`,
     `• World (${dateStr}): ${worldList || "—"}.`,
     `• Art: ${artList || "—"}.`,
-    `No words, numbers, or logos. No flags with readable marks.`,
+    `No words, numbers or logos. No real identifiable people.`,
     `Reflect these themes through symbolic scenes and objects; exact subjects/palette are up to you.`,
   ].join("\n");
 

@@ -76,7 +76,7 @@ export interface OpenEndedSpec {
   presentation?: "museum-grade" | "gallery" | "studio" | (string & {});  // e.g., "museum-grade"
   styleNote?: string;     // e.g., "surrealist"
   allowSymbolsHint?: string;
-  negativeRules?: ["No text, UI, charts, captions, or watermarks."];
+  negativeRules?: ["No text, UI, charts, captions, or watermarks. No real identifiable people."];
   strictness: "hard";
 }
 
@@ -95,7 +95,7 @@ export function buildOpenEndedPrompt(
 
   const negative = [
     "No text anywhere.",
-    "No UI, charts, captions, or watermarks.",
+    "No UI, charts, captions, or watermarks. No real identifiable people.",
     ...(open.negativeRules ?? []),
   ].join(" ");
 
@@ -134,7 +134,7 @@ export function composeOpenEndedAsResult(prompt: string): ComposePromptResult {
   return {
     prompt,
     negative_prompt:
-      "text, UI, captions, watermarks, charts, diagrams",
+      "text, UI, captions, watermarks, charts, diagrams, real identifiable people",
   };
 }
 
@@ -144,7 +144,7 @@ export function buildAdditiveUpdatePlan(worldCluster: Cluster): UpdatePlan {
     update_prompt:
      `Inside the PROVIDED MASKED AREA ONLY, add ONE clear, readable symbol for "${worldCluster.title}". ` +
      `Do NOT modify or restyle any pixels outside the mask. Preserve all existing content, palette, and composition. ` +
-     `No text or letters.`,
+     `No text or letters. No real identifiable people.`,
     suggested_mask: undefined,
     rationale: "Breaking world event — additive only; masked edit; preserve scene.",
     sources: srcs,
