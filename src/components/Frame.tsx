@@ -7,7 +7,7 @@ export default function Frame({ children }: { children: React.ReactNode }) {
         aspectRatio: "2 / 3",
         // Make height = 80% viewport; compute width from aspect (2/3 of height)
         height: "80vh",
-        width: "min(80vw, calc(80vh * 3 / 4))",
+        width: "calc(80vh * 2 / 3)",
         // Keep it responsive: never exceed viewport width
         maxWidth: "90vw",
       }}
