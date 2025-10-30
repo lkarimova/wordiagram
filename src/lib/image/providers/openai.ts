@@ -91,6 +91,7 @@ export async function editImageWithMask(opts: {
 
 /** Optional shims so older imports don’t break */
 export async function inpaintOrOverlay(opts: { base: Uint8Array; prompt: string; mask?: Uint8Array }) {
+  throw new Error("inpaintOrOverlay disabled: use editImageWithMask with an explicit or default mask");
   // If you later want to route through editImageWithMask when mask exists, you can do it here.
   return generatePng({ prompt: opts.prompt, width: 1024, height: 1536 });
 }
