@@ -59,7 +59,7 @@ export async function runDailyGeneration() {
     },
     {
       strictness: "hard", // structural locks are mandatory
-      negativeRules: ["No text, UI, charts, captions, or watermarks."],
+      negativeRules: ["No text, UI, charts, captions, or watermarks. No real identifiable people."],
     }
   );
 
