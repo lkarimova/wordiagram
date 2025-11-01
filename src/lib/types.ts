@@ -1,17 +1,19 @@
+// src/lib/types.ts
+
 export type NewsItem = {
   title: string;
   url: string;
   source: string;
-  publishedAt: string; // ISO
+  publishedAt?: string; // ISO (made optional since some feeds don't have it)
   summary?: string;
-  category?: 'world' | 'art';
+  category?: 'world'; // Only world news now
   regions?: string[];
   confidence?: number; // 0..1
 };
 
 export type Cluster = {
   id: string;
-  kind: 'world' | 'art';
+  kind: 'world'; // Only world news now
   title: string;
   items: NewsItem[];
   centroidEmbedding?: number[];
@@ -21,17 +23,10 @@ export type Cluster = {
 };
 
 export type BreakingDecision = {
-  kind: 'world' | 'art';
+  kind: 'world'; // Only world news now
   clusterId: string;
   rationale: string;
   sources: string[];
-};
-
-export type StyleDescriptor = {
-  descriptor: string;
-  palette: string[];
-  references?: string[];
-  blendRatio?: { previous: number; news: number };
 };
 
 export type ComposePromptResult = {
@@ -41,16 +36,6 @@ export type ComposePromptResult = {
   control_notes?: string;
 };
 
-export type UpdatePlan = {
-  update_prompt: string;
-  suggested_mask?: string; // url to mask if generated
-  rationale: string;
-  sources: string[];
-};
-
-export type RestylePlan = {
-  restyle_prompt: string;
-  blend_details: string;
-  rationale: string;
-  sources: string[];
-};
+// Removed: StyleDescriptor (no longer using art news for style)
+// Removed: UpdatePlan (no longer doing additive updates)
+// Removed: RestylePlan (no longer doing art-based restyling)

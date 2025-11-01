@@ -1,166 +1,184 @@
 // src/server/generation.ts
 import { formatInTimeZone } from "date-fns-tz";
 import { config } from "@/lib/config";
-import {
-  fetchWorldNews,
-  fetchArtNews,
-  rankAndCluster,
-} from "@/lib/news";
-import {
-  buildOpenEndedPrompt,
-  composeOpenEndedAsResult,
-  deriveArtStyleFromClusters,
-  styleBlock,
-} from "@/lib/prompts/builders";
+import { fetchWorldNews, rankAndCluster } from "@/lib/news";
+import { buildNewsPrompt, generateThemeSummary, listHeadlines } from "@/lib/prompts/builders";
 import { generateDailyBase } from "@/lib/image";
 import { savePngToStorage } from "@/lib/storage";
-import { insertDailyPainting } from "./supabase";
+import { insertDailyPainting, getLatestPainting } from "./supabase";
 
 function todayInTimezone(): string {
   const now = new Date();
   return formatInTimeZone(now, config.timezone, "yyyy-MM-dd");
 }
 
-function listHeadlines(items: { title: string; source?: string }[], n: number) {
-  return items
-    .slice(0, n)
-    .map(i => {
-      const title = (i.title || "").trim();
-      const source = (i.source || "").trim();
-      const t = title.length > 140 ? title.slice(0, 137) + "…" : title;
-      return source ? `${t} — ${source}` : t;
-    })
-    .join(" · "); // you can use "\n• " if you want new lines in DB text
+function nowTimestamp(): string {
+  return new Date().toISOString();
 }
 
+/**
+ * Daily generation at 6:00 AM ET
+ * Creates the baseline image for the day
+ */
 export async function runDailyGeneration() {
   const dateStr = todayInTimezone();
+  console.log("[generate] Starting daily generation for", dateStr);
 
-  // 1) Fetch & cluster news
+  // 1) Fetch & cluster world news
   const world = await fetchWorldNews();
-  const art = await fetchArtNews();
-
-  console.log("[generate] world count:", world.length);
-  console.log("[generate] art count  :", art.length);
+  console.log("[generate] world news count:", world.length);
 
   const worldClusters = rankAndCluster(world);
-  const artClusters = rankAndCluster(art);
-  const artStyle = deriveArtStyleFromClusters(artClusters);
+  console.log("[generate] world clusters:", worldClusters.length);
 
-  // 2) Base prompt: locks structure; leaves visuals open-ended
-  const basePrompt = buildOpenEndedPrompt(
-    {
-      aspect: "2:3",
-      includeFrame: true,
-      composition: "central vertical axis; layered composition",
-      balance: "asymmetric balance around a central mass",
-      camera: "slight low angle, human eye height",
-      space: "deep atmospheric perspective",
-    },
-    {
-      strictness: "hard", // structural locks are mandatory
-      negativeRules: ["No text, UI, charts, captions, or watermarks. No real identifiable people."],
-    }
-  );
+  // 2) Build prompt from news
+  const { prompt, negative_prompt } = buildNewsPrompt(worldClusters);
+  console.log("[generate] prompt:", prompt.substring(0, 200) + "...");
 
-  // 3) HARD CONTEXT from concrete story titles (not generic labels)
-  const worldList = listHeadlines(world, 5);
-  const artList = listHeadlines(art, 4);
-
-  const hardContext = [
-    `HARD CONTEXT — Interpret these headlines **visually** (no text glyphs in the image):`,
-    `• World (${dateStr}): ${worldList || "—"}.`,
-    `• Art: ${artList || "—"}.`,
-    `No words, numbers or logos. No real identifiable people.`,
-    `Reflect these themes through symbolic scenes and objects; exact subjects/palette are up to you.`,
-  ].join("\n");
-
-  const styleLines = `STYLE INFLUENCE — ${styleBlock(artStyle)}`;
-  const openEndedPrompt = `${basePrompt}\n${hardContext}\n${styleLines}`;
-
-  // 4) Convert to the { prompt, negative_prompt } your image fn expects
-  const { prompt: finalPrompt, negative_prompt } =
-    composeOpenEndedAsResult(openEndedPrompt);
-
-  console.log("[generate] prompt:", finalPrompt);
-
-  // 5) Generate & store image (2:3, 1024x1536)
+  // 3) Generate image (2:3 aspect, 1024x1536)
   const image = await generateDailyBase(
-    finalPrompt,
+    prompt,
     negative_prompt,
     config.aspect.width,
     config.aspect.height
   );
 
-  const imgUrl = await savePngToStorage(`${dateStr}/base.png`, image);
+  // 4) Save to storage
+  const imgUrl = await savePngToStorage(`${dateStr}/daily-${Date.now()}.png`, image);
+  console.log("[generate] saved image:", imgUrl);
 
-  // 6) Persist metadata + debug
+  // 5) Prepare metadata
+  const themeSummary = generateThemeSummary(worldClusters);
+  const headlinesList = listHeadlines(world, 20);
+
   const debug = {
     date: dateStr,
     aspect: `${config.aspect.width}x${config.aspect.height}`,
-    composer: {
-      basePrompt,
-      hardContext,
-      openEndedPrompt,
-      finalPrompt,
-      negative_prompt,
-    },
-    newsSelected: {
-      world: world.slice(0, 20).map(i => ({
-        title: i.title,
-        url: i.url,
-        source: i.source,
-      })),
-      art: art.slice(0, 20).map(i => ({
-        title: i.title,
-        url: i.url,
-        source: i.source,
-      })),
-    },
-    clustersPicked: {
-      world: worldClusters.slice(0, 5).map(c => ({
-        title: c.title,
-        size: c.items.length,
-      })),
-      art: artClusters.slice(0, 5).map(c => ({
-        title: c.title,
-        size: c.items.length,
-      })),
-    },
-    generatedAt: new Date().toISOString(),
+    prompt,
+    negative_prompt,
+    newsSelected: world.slice(0, 20).map(i => ({
+      title: i.title,
+      url: i.url,
+      source: i.source,
+      publishedAt: i.publishedAt,
+    })),
+    clustersPicked: worldClusters.slice(0, 10).map(c => ({
+      title: c.title,
+      size: c.items.length,
+      score: c.score,
+    })),
+    generatedAt: nowTimestamp(),
   };
 
-  // Specific, human-readable summaries (titles, not labels)
-  const world_theme_summary = worldList || "(no world items)";
-  const art_style_summary = artList || "(no art items)";
-
+  // 6) Save to database
   const row = await insertDailyPainting({
     date: dateStr,
-    base_image_url: imgUrl,
-    final_image_url: imgUrl,
-    prompt: { prompt: finalPrompt, negative_prompt },
-    style_descriptor: {
-      descriptor: artStyle.descriptor,
-      palette: artStyle.palette,
-      references: [],
+    image_url: imgUrl,
+    prompt: { prompt, negative_prompt },
+    world_theme_summary: themeSummary,
+    model_info: { 
+      model: "gpt-image-1", 
+      aspect: config.aspect, 
+      debug 
     },
-    world_theme_summary,
-    art_style_summary,
-    model_info: { model: "gpt-image-1", aspect: config.aspect, debug, artStyleChosen: artStyle },
-    // Save real sources for private inspection
     sources: {
       world: world.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,
       })),
-      art: art.slice(0, 20).map(i => ({
+    },
+    is_daily: true,
+  });
+
+  console.log("[generate] completed, row id:", row.id);
+  return row;
+}
+
+/**
+ * Breaking news generation
+ * Creates a completely new image when breaking news is detected
+ */
+export async function runBreakingGeneration(params: {
+  world: any[];
+  worldClusters: any[];
+  reason: { world: any[] };
+}) {
+  const dateStr = todayInTimezone();
+  const timestamp = nowTimestamp();
+  console.log("[breaking] Starting breaking news generation", { dateStr, timestamp });
+
+  const { world, worldClusters, reason } = params;
+
+  // 1) Build prompt highlighting the breaking news
+  const breakingClusters = reason.world.map(d => 
+    worldClusters.find(c => c.id === d.clusterId)
+  ).filter(Boolean);
+
+  const { prompt, negative_prompt } = buildNewsPrompt(breakingClusters.length > 0 ? breakingClusters : worldClusters);
+  console.log("[breaking] prompt:", prompt.substring(0, 200) + "...");
+
+  // 2) Generate new image
+  const image = await generateDailyBase(
+    prompt,
+    negative_prompt,
+    config.aspect.width,
+    config.aspect.height
+  );
+
+  // 3) Save to storage with timestamp
+  const imgUrl = await savePngToStorage(
+    `${dateStr}/breaking-${Date.now()}.png`, 
+    image
+  );
+  console.log("[breaking] saved image:", imgUrl);
+
+  // 4) Prepare metadata
+  const themeSummary = generateThemeSummary(breakingClusters.length > 0 ? breakingClusters : worldClusters);
+
+  const debug = {
+    date: dateStr,
+    timestamp,
+    type: "breaking",
+    aspect: `${config.aspect.width}x${config.aspect.height}`,
+    prompt,
+    negative_prompt,
+    breakingReason: reason,
+    newsSelected: world.slice(0, 20).map(i => ({
+      title: i.title,
+      url: i.url,
+      source: i.source,
+      publishedAt: i.publishedAt,
+    })),
+    clustersPicked: worldClusters.slice(0, 10).map(c => ({
+      title: c.title,
+      size: c.items.length,
+      score: c.score,
+    })),
+    generatedAt: timestamp,
+  };
+
+  // 5) Save to database
+  const row = await insertDailyPainting({
+    date: dateStr,
+    image_url: imgUrl,
+    prompt: { prompt, negative_prompt },
+    world_theme_summary: `BREAKING: ${themeSummary}`,
+    model_info: { 
+      model: "gpt-image-1", 
+      aspect: config.aspect, 
+      debug 
+    },
+    sources: {
+      world: world.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,
       })),
     },
-  } as any);
+    is_daily: false,
+  });
 
+  console.log("[breaking] completed, row id:", row.id);
   return row;
 }

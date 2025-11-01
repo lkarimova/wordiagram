@@ -12,11 +12,10 @@ function csv(name: string, fallback: string[]): string[] {
 export const config = (() => {
   const env = getEnv();
 
-  // Allowed sizes for gpt-image-1 portrait include 1024x1536 (2:3).
-  // If you want higher res later, we can upscale post-generation.
+  // 2:3 portrait for gpt-image-1
   const aspect: Aspect = { width: 1024, height: 1536 };
 
-  // 20 world feeds (free) + 10 art feeds (free).
+  // 20 world news feeds (free)
   const WORLD_FALLBACK = [
     "https://feeds.bbci.co.uk/news/world/rss.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
@@ -40,30 +39,15 @@ export const config = (() => {
     "https://www.abc.net.au/news/feed/51120/rss.xml",
   ];
 
-  const ART_FALLBACK = [
-    "https://www.artnews.com/c/art-news/news/feed/",
-    "https://www.artforum.com/rss.xml",
-    "https://www.theartnewspaper.com/rss.xml",
-    "https://news.artnet.com/feed",
-    "https://hyperallergic.com/feed/",
-    "https://www.frieze.com/rss.xml",
-    "https://www.apollo-magazine.com/feed/",
-    "https://artreview.com/feed/",
-    "https://www.thisiscolossal.com/feed/",
-    "https://www.artsy.net/rss?channel=articles",
-  ];
-
   return {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
-      dailyHourLocal: 6,
-      scanEveryHours: 4,
+      dailyHourLocal: 6, // 6:00 AM ET
+      breakingCheckMinutes: 15, // Check every 15 minutes for breaking news
     },
-    // IMPORTANT: keep portrait 2:3 to match your <Frame> and gpt-image-1 allowed size
     aspect,
 
     news: {
-      // You can override via env: NEWS_SOURCES_WORLD / NEWS_SOURCES_ART (comma-separated)
       worldSources:
         csv("NEWS_SOURCES_WORLD", []).length > 0
           ? csv("NEWS_SOURCES_WORLD", [])
@@ -76,44 +60,27 @@ export const config = (() => {
               .map(s => s.trim())
               .filter(Boolean)
           : WORLD_FALLBACK,
-      artSources:
-        csv("NEWS_SOURCES_ART", []).length > 0
-          ? csv("NEWS_SOURCES_ART", [])
-          : (env.NEWS_SOURCES_ART || "")
-              .split(",")
-              .map(s => s.trim())
-              .filter(Boolean).length > 0
-          ? (env.NEWS_SOURCES_ART || "")
-              .split(",")
-              .map(s => s.trim())
-              .filter(Boolean)
-          : ART_FALLBACK,
-      cacheMinutes: 20,
+      cacheMinutes: 15, // Cache news for 15 minutes
     },
 
-    // Keep your thresholds; the clustering code will supply sizes/recency/sources.
+    // Breaking news detection thresholds
     breakingRules: {
       world: {
-        minTier1Agree: 3,
-        windowHours: 2,
-        minRegions: 3,
-      },
-      art: {
-        minAgree: 2,
+        minItems: 3,        // At least 3 items in cluster
+        minSources: 2,      // From at least 2 different sources
+        recencyBoost: 0.9,  // OR very recent (within ~1 hour) with 2+ items
       },
     },
 
-    // Preserve your interpolation ratio
+    // Fixed style prompt (no art news influence)
     style: {
-      restyleInterpolation: { previous: 0.4, news: 0.6 },
+      prompt: "Contemporary oil painting with vibrant, saturated colors and bold impasto brushwork. Modern editorial illustration style with rich jewel tones and dynamic color relationships. Museum-quality presentation with ornate frame.",
     },
 
-    // You’ve switched to Supabase Storage for images, but publicPrefix can remain
     storage: {
       publicPrefix: "world-news-painting",
     },
 
-    // Keep mock toggles, but default them to false unless env explicitly sets true
     mock: {
       news: (env.MOCK_NEWS || "false") === "true",
       images: (env.MOCK_IMAGES || "false") === "true",

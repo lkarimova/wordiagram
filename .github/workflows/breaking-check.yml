@@ -1,0 +1,28 @@
+# .github/workflows/breaking-check.yml
+name: Breaking News Check (Every 15 min)
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  check-breaking:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for breaking news
+        env:
+          SITE_URL: https://www.wordiagram.com
+          TOKEN: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          URL="${SITE_URL}/api/update?token=${TOKEN}"
+          echo "POST $URL"
+          code=$(curl -X POST -sS -o /tmp/resp.json -w "%{http_code}" "$URL" || true)
+          cat /tmp/resp.json || true
+          # Don't fail if no breaking news (200 response)
+          if [ "$code" != "200" ]; then
+            echo "Error: HTTP $code"
+            exit 1
+          fi

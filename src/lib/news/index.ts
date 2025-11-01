@@ -22,7 +22,6 @@ function dedupeByUrl<T extends { url: string }>(items: T[]): T[] {
 }
 
 function logErr(ctx: string, err: unknown) {
-  // keep logs terse in prod; useful in /api/generate logs
   console.error(`[news] ${ctx}`, (err as Error)?.message ?? err);
 }
 
@@ -37,7 +36,7 @@ function extractKeywords(titles: string[], max = 8): string[] {
   const freq = new Map<string, number>();
   for (const t of titles) {
     const words = t.toLowerCase()
-      .replace(/[“”"’'`()]/g, '')
+      .replace(/["""''`()]/g, '')
       .replace(/[^a-z0-9\- ]+/g, ' ')
       .split(/\s+/)
       .filter(Boolean);
@@ -79,14 +78,15 @@ async function fetchRss(url: string): Promise<NewsItem[]> {
           title: (i.title || '').toString().trim(),
           url: link,
           source: host,
-          publishedAt: i.isoDate || i.pubDate || undefined
+          publishedAt: i.isoDate || i.pubDate || undefined,
+          category: 'world' as const,
         };
       })
       .filter(i => i.title && i.url);
     return items as NewsItem[];
   } catch (err) {
     logErr(`Failed feed ${url}`, err);
-    return []; // no placeholders
+    return [];
   }
 }
 
@@ -104,33 +104,17 @@ export async function fetchWorldNews(): Promise<NewsItem[]> {
     return [];
   }
   const batches = await Promise.all(feeds.map(fetchRss));
-  return dedupeByUrl(batches.flat().map(i => ({ ...i, category: 'world' as const })));
-}
-
-export async function fetchArtNews(): Promise<NewsItem[]> {
-  if (config.mock.news) {
-    return [
-      { title: 'Major museum announces landmark retrospective', url: 'https://example.com/c', source: 'mock', publishedAt: new Date().toISOString(), category: 'art' },
-      { title: 'Record-setting auction drives palette discourse', url: 'https://example.com/d', source: 'mock', publishedAt: new Date().toISOString(), category: 'art' },
-    ];
-  }
-  const feeds = config.news.artSources || [];
-  if (!feeds.length) {
-    console.warn('[news] No artSources configured');
-    return [];
-  }
-  const batches = await Promise.all(feeds.map(fetchRss));
-  return dedupeByUrl(batches.flat().map(i => ({ ...i, category: 'art' as const })));
+  return dedupeByUrl(batches.flat());
 }
 
 /** Keyword-based clustering with simple scoring (size + recency + source diversity). */
-export function rankAndCluster(items: NewsItem[], defaultKind: 'world'|'art' = 'world'): Cluster[] {
+export function rankAndCluster(items: NewsItem[]): Cluster[] {
   if (!items.length) return [];
   const keywords = extractKeywords(items.map(i => i.title), 10);
   if (!keywords.length) {
     return [{
-      id: `${defaultKind}:misc`,
-      kind: defaultKind,
+      id: `world:misc`,
+      kind: 'world',
       title: 'misc',
       items,
       score: items.length
@@ -148,15 +132,14 @@ export function rankAndCluster(items: NewsItem[], defaultKind: 'world'|'art' = '
   const clusters: Cluster[] = [];
   for (const [key, members] of buckets.entries()) {
     if (!members.length) continue;
-    const kind = (members[0].category || defaultKind) as 'world'|'art';
     const uniqueSources = new Set(members.map(m => m.source || ''));
     const recAvg = members.reduce((s, m) => s + recencyScore(m.publishedAt), 0) / members.length;
-    const score = members.length + uniqueSources.size * 0.75 + recAvg; // tweak as wanted
+    const score = members.length + uniqueSources.size * 0.75 + recAvg;
 
     clusters.push({
-      id: `${kind}:${key}`,
-      kind,
-      title: key,       // concise keyword/phrase label
+      id: `world:${key}`,
+      kind: 'world',
+      title: key,
       items: members,
       score
     } as Cluster);
@@ -165,22 +148,52 @@ export function rankAndCluster(items: NewsItem[], defaultKind: 'world'|'art' = '
   return clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
 }
 
-/** Decide which clusters are “breaking” by coverage/recency. */
-export function detectBreaking(prev: Cluster[] | undefined, clusters: Cluster[], kind: 'world'|'art'): BreakingDecision[] {
+/** Decide which clusters are "breaking" by coverage/recency. */
+export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {
   const out: BreakingDecision[] = [];
-  const relevant = clusters.filter(c => c.kind === kind);
-  for (const c of relevant) {
+  const { minItems, minSources, recencyBoost } = config.breakingRules.world;
+  
+  for (const c of clusters) {
     const sources = new Set(c.items.map(i => i.source || ''));
-    const recentBoost = Math.max(...c.items.map(i => recencyScore(i.publishedAt)));
-    // thresholds: >= 3 items from >= 2 sources, or very recent & >= 2 items
-    if ((c.items.length >= (kind === 'world' ? 3 : 2) && sources.size >= 2) || (recentBoost >= 0.9 && c.items.length >= 2)) {
+    const maxRecency = Math.max(...c.items.map(i => recencyScore(i.publishedAt)));
+    
+    // Breaking if: enough items from multiple sources, OR very recent with decent volume
+    const isBreaking = 
+      (c.items.length >= minItems && sources.size >= minSources) || 
+      (maxRecency >= recencyBoost && c.items.length >= 2);
+    
+    if (isBreaking) {
       out.push({
-        kind,
+        kind: 'world',
         clusterId: c.id,
-        rationale: `size=${c.items.length}, sources=${sources.size}, recentBoost=${recentBoost.toFixed(2)}`,
+        rationale: `size=${c.items.length}, sources=${sources.size}, recentBoost=${maxRecency.toFixed(2)}`,
         sources: c.items.slice(0, 5).map(i => i.url)
       });
     }
   }
   return out;
+}
+
+// Simple in-memory cache for headline comparison
+let lastSeenHeadlines: Set<string> = new Set();
+
+/** Lightweight check: compare headlines to detect if news has changed significantly */
+export function hasSignificantNewsChange(items: NewsItem[]): boolean {
+  const currentHeadlines = new Set(items.map(i => i.title));
+  
+  // On first run, store headlines and return false
+  if (lastSeenHeadlines.size === 0) {
+    lastSeenHeadlines = currentHeadlines;
+    return false;
+  }
+  
+  // Calculate overlap
+  const overlap = [...currentHeadlines].filter(h => lastSeenHeadlines.has(h)).length;
+  const changeRatio = 1 - (overlap / Math.max(currentHeadlines.size, 1));
+  
+  // Update cache
+  lastSeenHeadlines = currentHeadlines;
+  
+  // Significant if >30% of headlines are new
+  return changeRatio > 0.3;
 }
