@@ -74,7 +74,7 @@ export const config = (() => {
 
     // Fixed style prompt (no art news influence)
     style: {
-      prompt: "Contemporary oil painting with vibrant, saturated colors and bold impasto brushwork. Modern editorial illustration style with rich jewel tones and dynamic color relationships. Museum-quality presentation with ornate frame.",
+      prompt: "Contemporary oil painting with vibrant colors and bold impasto brushwork. Modern editorial illustration style with rich jewel tones and dynamic color relationships. Museum-quality presentation with ornate frame.",
     },
 
     storage: {
