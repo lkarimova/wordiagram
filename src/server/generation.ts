@@ -28,7 +28,7 @@ export async function runDailyGeneration() {
   const world = await fetchWorldNews();
   console.log("[generate] world news count:", world.length);
 
-  const worldClusters = rankAndCluster(world);
+  const worldClusters = await rankAndCluster(world);
   console.log("[generate] world clusters:", worldClusters.length);
 
   // 2) Build prompt from news

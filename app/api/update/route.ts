@@ -10,7 +10,7 @@ export const runtime = "nodejs";
  * Called every 15 minutes to check for breaking news
  * Only generates new image if:
  * 1. Headlines have changed significantly (lightweight check)
- * 2. Breaking news is detected (clustering check)
+ * 2. Breaking news is detected (clustering check with embeddings)
  */
 export async function POST(request: NextRequest) {
   // Optional: Protect with token
@@ -35,10 +35,10 @@ export async function POST(request: NextRequest) {
       }, { status: 200 });
     }
     
-    console.log("[update] Significant headline changes detected, checking for breaking news");
+    console.log("[update] Significant headline changes detected, running clustering with embeddings");
 
-    // Step 2: Run clustering to detect breaking news
-    const worldClusters = rankAndCluster(world);
+    // Step 2: Run clustering to detect breaking news (now with embeddings - async!)
+    const worldClusters = await rankAndCluster(world);
     console.log("[update] Created", worldClusters.length, "clusters");
     
     const worldBreaking = detectBreaking(worldClusters);
