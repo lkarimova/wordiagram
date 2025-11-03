@@ -3,13 +3,11 @@ export default function Frame({ children }: { children: React.ReactNode }) {
     <div
       className="relative mx-auto"
       style={{
-        // 2:3 portrait
+        // 2:3 portrait aspect ratio
         aspectRatio: "2 / 3",
-        // Make height = 80% viewport; compute width from aspect (2/3 of height)
-        height: "80vh",
-        width: "calc(80vh * 2 / 3)",
-        // Keep it responsive: never exceed viewport width
-        maxWidth: "90vw",
+        // Responsive sizing: use width-based on mobile, height-based on desktop
+        width: "min(90vw, calc(70vh * 2 / 3))",
+        maxWidth: "600px", // Cap maximum size
       }}
     >
       <svg

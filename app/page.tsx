@@ -30,7 +30,7 @@ export default async function Home() {
               alt="World-News Painting"
               fill
               style={{ objectFit: "cover" }}
-              sizes="(max-width: 1024px) 90vw, 60vw"
+              sizes="(max-width: 768px) 90vw, 600px"
               priority
             />
           ) : (
