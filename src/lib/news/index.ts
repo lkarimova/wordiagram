@@ -194,6 +194,6 @@ export function hasSignificantNewsChange(items: NewsItem[]): boolean {
   // Update cache
   lastSeenHeadlines = currentHeadlines;
   
-  // Significant if >30% of headlines are new
-  return changeRatio > 0.3;
+  // Significant if >20% of headlines are new (lowered threshold)
+  return changeRatio > config.headlineChangeThreshold;
 }

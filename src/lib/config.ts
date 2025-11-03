@@ -15,28 +15,51 @@ export const config = (() => {
   // 2:3 portrait for gpt-image-1
   const aspect: Aspect = { width: 1024, height: 1536 };
 
-  // 20 world news feeds (free)
+  // 30 diverse world news feeds (global coverage, varied perspectives)
   const WORLD_FALLBACK = [
+    // North America
     "https://feeds.bbci.co.uk/news/world/rss.xml",
     "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",
     "https://rss.cnn.com/rss/edition_world.rss",
     "https://www.theguardian.com/world/rss",
     "https://feeds.npr.org/1004/rss.xml",
+    "https://www.cbc.ca/cmlink/rss-world",
+    "https://www.latimes.com/world/rss2.0.xml",
+    "https://globalnews.ca/world/feed/",
+    
+    // Europe
     "https://feeds.reuters.com/reuters/worldNews",
-    "https://www.aljazeera.com/xml/rss/all.xml",
     "https://rss.dw.com/rdf/rss-en-all",
     "https://www.france24.com/en/rss",
     "https://www.ft.com/world?format=rss",
     "https://feeds.skynews.com/feeds/rss/world.xml",
-    "https://www.cbc.ca/cmlink/rss-world",
-    "https://www.latimes.com/world/rss2.0.xml",
-    "https://www.economist.com/sections/international/rss.xml",
     "https://www.rfi.fr/en/rss",
-    "https://globalnews.ca/world/feed/",
+    "https://www.economist.com/sections/international/rss.xml",
+    
+    // Middle East & Africa
+    "https://www.aljazeera.com/xml/rss/all.xml",
+    "https://english.alarabiya.net/rss.xml",
+    
+    // Asia-Pacific
     "https://www.scmp.com/rss/91/feed",
     "https://www.japantimes.co.jp/news/world/feed/",
     "https://english.kyodonews.net/rss/news.xml",
     "https://www.abc.net.au/news/feed/51120/rss.xml",
+    "https://www.straitstimes.com/news/world/rss.xml",
+    "https://timesofindia.indiatimes.com/rssfeeds/296589292.cms",
+    
+    // Latin America
+    "https://rss.uol.com.br/feed/noticias.xml",
+    
+    // International Organizations
+    "https://news.un.org/feed/subscribe/en/news/all/rss.xml",
+    
+    // Diverse Perspectives
+    "https://www.neweurope.eu/feed/",
+    "https://www.globalissues.org/news/feed",
+    "https://www.csmonitor.com/layout/set/rss/World",
+    "https://www.pbs.org/newshour/feeds/rss/world",
+    "https://apnews.com/hub/world-news?format=rss",
   ];
 
   return {
@@ -63,18 +86,21 @@ export const config = (() => {
       cacheMinutes: 15, // Cache news for 15 minutes
     },
 
-    // Breaking news detection thresholds
+    // Breaking news detection thresholds (LOWERED)
     breakingRules: {
       world: {
-        minItems: 3,        // At least 3 items in cluster
+        minItems: 2,        // At least 2 items in cluster (was 3)
         minSources: 2,      // From at least 2 different sources
         recencyBoost: 0.9,  // OR very recent (within ~1 hour) with 2+ items
       },
     },
 
-    // Fixed style prompt (no art news influence)
+    // Headline change threshold (LOWERED to 20%)
+    headlineChangeThreshold: 0.2, // 20% change triggers clustering check (was 0.3)
+
+    // Fixed style prompt (symbolic, balanced colors, no recognizable people/flags)
     style: {
-      prompt: "Contemporary oil painting with vibrant colors and bold impasto brushwork. Modern editorial illustration style with rich jewel tones and dynamic color relationships. Museum-quality presentation with ornate frame.",
+      prompt: "Symbolic oil painting with dreamlike, mythological imagery. Use two dominant colors (varied each time - choose from warm tones, cool tones, earth tones, or jewel tones) balanced with a full spectrum of supporting hues. Soft, diffused lighting with gentle contrast. Rich impasto texture. Draw inspiration from surrealist dreams, mythology, folklore, fantasy literature, and cinematic symbolism. Favor metaphorical elements over literal depictions: celestial bodies, natural phenomena, architectural fragments, mysterious vessels, ethereal creatures, abstract forms, botanical elements, and atmospheric effects. Avoid literal war imagery (guns, tanks, arrows), skulls, globes, or recognizable figures. Museum-quality presentation with ornate frame.",
     },
 
     storage: {
