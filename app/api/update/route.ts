@@ -22,12 +22,21 @@ export async function POST(request: NextRequest) {
   try {
     console.log("[update] Starting breaking news check");
     
-    // Step 1: Lightweight check - fetch news and compare headlines
+    // Step 1: Get the current displayed image and its headlines
+    const { getLatestPainting } = await import("@/src/server/supabase");
+    const currentPainting = await getLatestPainting();
+    const lastHeadlines = currentPainting?.sources?.world
+      ?.map((s: any) => s.title)
+      .filter(Boolean) || null;
+    
+    console.log("[update] Last image had", lastHeadlines?.length || 0, "headlines");
+    
+    // Step 2: Lightweight check - fetch news and compare headlines to LAST IMAGE
     const world = await fetchWorldNews();
     console.log("[update] Fetched", world.length, "world news items");
     
-    if (!hasSignificantNewsChange(world)) {
-      console.log("[update] No significant headline changes detected");
+    if (!hasSignificantNewsChange(world, lastHeadlines)) {
+      console.log("[update] No significant headline changes compared to last image");
       return NextResponse.json({ 
         ok: true, 
         breaking: false, 
@@ -35,7 +44,7 @@ export async function POST(request: NextRequest) {
       }, { status: 200 });
     }
     
-    console.log("[update] Significant headline changes detected, running clustering with embeddings");
+    console.log("[update] Significant headline changes detected compared to last image, running clustering with embeddings");
 
     // Step 2: Run clustering to detect breaking news (now with embeddings - async!)
     const worldClusters = await rankAndCluster(world);

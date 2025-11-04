@@ -280,25 +280,28 @@ export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {
   return out;
 }
 
-// Simple in-memory cache for headline comparison
-let lastSeenHeadlines: Set<string> = new Set();
-
-/** Lightweight check: compare headlines to detect if news has changed significantly */
-export function hasSignificantNewsChange(items: NewsItem[]): boolean {
-  const currentHeadlines = new Set(items.map(i => i.title));
+/** 
+ * Lightweight check: compare headlines to detect if news has changed significantly
+ * Compares against headlines from the LAST GENERATED IMAGE, not just last check
+ */
+export function hasSignificantNewsChange(
+  currentItems: NewsItem[], 
+  lastImageHeadlines: string[] | null
+): boolean {
+  const currentHeadlines = currentItems.map(i => i.title);
   
-  if (lastSeenHeadlines.size === 0) {
-    lastSeenHeadlines = currentHeadlines;
-    return false;
+  // If no previous image headlines, consider it significant (first image)
+  if (!lastImageHeadlines || lastImageHeadlines.length === 0) {
+    console.log(`[headlines] No previous image headlines, considering significant`);
+    return true;
   }
   
-  const overlap = [...currentHeadlines].filter(h => lastSeenHeadlines.has(h)).length;
-  const changeRatio = 1 - (overlap / Math.max(currentHeadlines.size, 1));
+  const lastSet = new Set(lastImageHeadlines);
+  const overlap = currentHeadlines.filter(h => lastSet.has(h)).length;
+  const changeRatio = 1 - (overlap / Math.max(currentHeadlines.length, 1));
   
-  console.log(`[headlines] Change ratio: ${(changeRatio * 100).toFixed(1)}% (threshold: ${(config.headlineChangeThreshold * 100)}%)`);
+  console.log(`[headlines] Change ratio: ${(changeRatio * 100).toFixed(1)}% (threshold: ${(config.headlineChangeThreshold * 100)}%) - comparing to last image`);
   
-  lastSeenHeadlines = currentHeadlines;
-  
-  // Significant if >20% of headlines are new (lowered threshold)
+  // Significant if >20% of headlines are new compared to last image
   return changeRatio > config.headlineChangeThreshold;
 }
