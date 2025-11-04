@@ -96,7 +96,7 @@ export const config = (() => {
     },
 
     // Headline change threshold
-    headlineChangeThreshold: 0.5, // 50% change triggers clustering check
+    headlineChangeThreshold: 0.75, // 75% change triggers clustering check
 
     storage: {
       publicPrefix: "world-news-painting",
