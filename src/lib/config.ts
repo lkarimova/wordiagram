@@ -66,7 +66,7 @@ export const config = (() => {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
       dailyHourLocal: 6, // 6:00 AM ET
-      breakingCheckMinutes: 15, // Check every 15 minutes for breaking news
+      breakingCheckMinutes: 30, // Check every 30 minutes for breaking news
     },
     aspect,
 
@@ -83,20 +83,20 @@ export const config = (() => {
               .map(s => s.trim())
               .filter(Boolean)
           : WORLD_FALLBACK,
-      cacheMinutes: 15, // Cache news for 15 minutes
+      cacheMinutes: 30, // Cache news for 30 minutes
     },
 
     // Breaking news detection thresholds (LOWERED)
     breakingRules: {
       world: {
-        minItems: 5,        // At least 2 items in cluster (was 3)
-        minSources: 3,      // From at least 2 different sources
-        recencyBoost: 0.95,  // OR very recent (within ~1 hour) with 2+ items
+        minItems: 5,        // At least 5 items in cluster
+        minSources: 3,      // From at least 3 different sources
+        recencyBoost: 0.95,  // OR very recent (within ~1 hour) with 3+ items
       },
     },
 
-    // Headline change threshold (LOWERED to 20%)
-    headlineChangeThreshold: 0.5, // 20% change triggers clustering check (was 0.3)
+    // Headline change threshold
+    headlineChangeThreshold: 0.5, // 50% change triggers clustering check (was 0.3)
 
     // Fixed style prompt (symbolic, balanced colors, no recognizable people/flags)
     style: {
