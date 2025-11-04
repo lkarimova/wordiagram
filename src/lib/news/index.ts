@@ -99,7 +99,15 @@ async function getEmbeddings(texts: string[]): Promise<number[][] | null> {
       input: texts,
     });
     return response.data.map(d => d.embedding);
-  } catch (err) {
+  } catch (err: any) {
+    const msg = (err as Error)?.message ?? String(err);
+    // This is where your "safety_violations=[sexual]" error is coming from
+    if (msg.includes('safety_violations')) {
+      console.warn('[embeddings] Request rejected by safety system, falling back to non-semantic clustering');
+      // IMPORTANT: do NOT rethrow; just return null so we can gracefully fallback
+      return null;
+    }
+
     logErr('Embeddings API error', err);
     return null;
   }
@@ -139,6 +147,7 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   const embeddings = await getEmbeddings(titles);
 
   if (!embeddings || embeddings.length !== items.length) {
+    // Fallback path: embeddings failed (including safety rejection)
     console.warn('[clustering] Embeddings unavailable or mismatched; returning single misc cluster');
     return [{
       id: 'world:misc',
@@ -229,21 +238,21 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
         id: `world:${idx}`,
         kind: 'world',
         title: repTitle,
-        items: members, // extra embedding field is fine structurally
+        items: members,
         score,
       } as Cluster;
     });
 
-  const sorted = clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
-  console.log(
-    `[clustering] Created ${sorted.length} semantic clusters, top 3:`,
-    sorted
-      .slice(0, 3)
-      .map(c => `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`)
-  );
-
-  return sorted;
-}
+    const sorted = clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
+    console.log(
+      `[clustering] Created ${sorted.length} semantic clusters, top 3:`,
+      sorted
+        .slice(0, 3)
+        .map(c => `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`)
+    );
+  
+    return sorted;
+  }
 
 /** Decide which clusters are "breaking" by coverage/recency. */
 export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {

@@ -16,7 +16,13 @@ export async function GET(req: NextRequest) {
     const result = await runDailyGeneration(); // should save image + return URL/metadata
     return NextResponse.json({ ok: true, result }, { status: 200 });
   } catch (err) {
-    console.error("generate error", err);
-    return NextResponse.json({ ok: false, error: (err as Error).message }, { status: 500 });
+    console.error("[generate] error", err);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Internal error while generating daily image",
+      },
+      { status: 500 }
+    );
   }
 }

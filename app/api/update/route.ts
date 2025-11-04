@@ -83,9 +83,12 @@ export async function POST(request: NextRequest) {
     
   } catch (err: any) {
     console.error("[update] Error:", err);
-    return NextResponse.json({ 
-      ok: false, 
-      error: err?.message || "breaking check failed" 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Internal error while checking for breaking news",
+      },
+      { status: 500 }
+    );
   }
 }
