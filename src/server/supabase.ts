@@ -83,27 +83,20 @@ export async function getLatestPaintingForDate(date: string) {
   return data as DailyPainting | null;
 }
 
-/** List archive: one final image per day (the latest one) */
-export async function listArchive(limit = 60) {
-  const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
+/** List archive: all images per day */
+export async function listArchive(limit = 90) {
   const { data, error } = await anon()
     .from("daily_paintings")
     .select("id,date,image_url,created_at,is_daily")
-    .neq("date", today)
     .order("date", { ascending: false })
-    .order("created_at", { ascending: false });
-  if (error) throw error;
+    .order("created_at", { ascending: false })
+    .limit(limit); // limit by images, not days
 
-  // Dedupe: keep only the latest image per date
-  const seen = new Set<string>();
-  const deduped = [];
-  for (const row of data ?? []) {
-    if (seen.has(row.date)) continue;
-    seen.add(row.date);
-    deduped.push(row);
-    if (deduped.length >= limit) break;
-  }
-  return deduped as Pick<DailyPainting, "id"|"date"|"image_url"|"created_at"|"is_daily">[];
+  if (error) throw error;
+  return data as Pick<
+    DailyPainting,
+    "id" | "date" | "image_url" | "created_at" | "is_daily"
+  >[];
 }
 
 /** List all images for a specific date (for viewing multiple updates) */

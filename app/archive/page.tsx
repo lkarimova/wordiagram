@@ -8,7 +8,6 @@ const TZ = "America/New_York";
 export default async function ArchivePage() {
   const items = await listArchive(90);
   const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
-  const pastOnly = items.filter(i => i.date !== today);
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -17,25 +16,31 @@ export default async function ArchivePage() {
           <h1 className="text-xl font-medium">Archive</h1>
           <Link href="/" className="underline">Back to today</Link>
         </div>
-        {pastOnly.length === 0 ? (
+        {items.length === 0 ? (
           <p className="text-sm text-neutral-600">No entries yet.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {pastOnly.map((p) => {
+            {items.map((p) => {
               const src = p.image_url;
               const bust = `${src}${src.includes("?") ? "&" : "?"}v=${encodeURIComponent(p.id)}`;
+
+              // Show full datetime for clarity
+              const label = p.created_at
+                ? formatInTimeZone(new Date(p.created_at), TZ, "yyyy-MM-dd HH:mm")
+                : p.date;
+
               return (
                 <Link key={p.id} href={`/painting/${p.date}`} className="block">
                   <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
                     <Image
                       src={bust}
-                      alt={p.date}
+                      alt={label}
                       fill
                       style={{ objectFit: "cover" }}
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-neutral-700">{p.date}</p>
+                  <p className="mt-2 text-sm text-neutral-700">{label}</p>
                 </Link>
               );
             })}
