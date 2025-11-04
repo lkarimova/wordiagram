@@ -21,76 +21,83 @@ const BASE_STYLE_PROMPT = [
 function softenTitleForPrompt(title: string): string | null {
   if (!title) return null;
 
+  // If the headline contains certain sexual content terms, skip it entirely
+  const FORCE_SKIP_PATTERNS = [
+    /\bsex(ual)?\b/i,
+    /\bsex[-\s]?doll(s)?\b/i,
+    /\bporn(ography|ographic|o)?\b/i,
+    /\bchild sexual abuse\b/i,
+    /\bsexual abuse\b/i,
+    /\bsexual assault\b/i,
+    /\bsex crime(s)?\b/i,
+    /\bgrooming\b/i,
+    /\bmolest(ed|ation|ing)?\b/i,
+    /\bprostitut(e|ion|ed|ing|es)\b/i,
+    /\brape(d|s|ing)?\b/i,
+  ];
+
+  if (FORCE_SKIP_PATTERNS.some((re) => re.test(title))) {
+    // Do not use this cluster in the image prompt at all
+    return null;
+  }
+
   // Known harsh terms and what to do with them:
   // - string => replace with that phrase
   // - null   => drop the word entirely
   const HARSH_MAP: Record<string, string | null> = {
     // very strong / graphic-ish
-    "massacre": "a deadly attack",
-    "massacres": "deadly attacks",
-    "genocide": "attempts to destroy a group",
-    "murder": "killing",
-    "murders": "killings",
+    massacre: "a deadly attack",
+    massacres: "deadly attacks",
+    genocide: "attempts to destroy a group",
+    murder: "killing",
+    murders: "killings",
 
     // killing / death
-    "killed": "lost their lives",
-    "killing": "loss of life",
-    "kills": "loss of life",
-    "slain": "lost their lives",
-    "dead": "fatalities",
-    "deaths": "loss of life",
+    killed: "lost their lives",
+    killing: "loss of life",
+    kills: "loss of life",
+    slain: "lost their lives",
+    dead: "fatalities",
+    deaths: "loss of life",
 
     // attacks / strikes
-    "attack": "a violent incident",
-    "attacks": "violent incidents",
-    "attacked": "hit by violence",
-    "bombing": "an explosion",
-    "bombings": "explosions",
-    "bomb": "an explosive device",
-    "bombs": "explosive devices",
-    "explosion": "a destructive blast",
-    "explosions": "destructive blasts",
-    "airstrike": "an air attack",
-    "airstrikes": "air attacks",
-    "shelling": "heavy fire",
+    attack: "a violent incident",
+    attacks: "violent incidents",
+    attacked: "hit by violence",
+    bombing: "an explosion",
+    bombings: "explosions",
+    bomb: "an explosive device",
+    bombs: "explosive devices",
+    explosion: "a destructive blast",
+    explosions: "destructive blasts",
+    airstrike: "an air attack",
+    airstrikes: "air attacks",
+    shelling: "heavy fire",
 
     // abuse / torture
-    "abuse": "mistreatment",
-    "abused": "severely mistreated",
-    "abusing": "severe mistreatment",
-    "torture": "severe mistreatment",
-    "tortured": "severely mistreated",
-    "torturing": "severe mistreatment",
+    abuse: "mistreatment",
+    abused: "severely mistreated",
+    abusing: "severe mistreatment",
+    torture: "severe mistreatment",
+    tortured: "severely mistreated",
+    torturing: "severe mistreatment",
 
     // terror / extremist
-    "terror": "extremist violence",
-    "terrorism": "extremist violence",
-    "terrorist": "extremist group",
-    "terrorists": "extremist groups",
+    terror: "extremist violence",
+    terrorism: "extremist violence",
+    terrorist: "an extremist group",
+    terrorists: "extremist groups",
 
     // hostages / kidnapping
-    "hostage": "captive",
-    "hostages": "captives",
-    "kidnap": "abduction",
-    "kidnapped": "abducted",
-    "kidnapping": "abduction",
-    "kidnappings": "abductions",
+    hostage: "captive",
+    hostages: "captives",
+    kidnap: "abduction",
+    kidnapped: "abducted",
+    kidnapping: "abduction",
+    kidnappings: "abductions",
 
-    // if you want to *remove* certain words entirely, map to null
-    // e.g. "rape": null,
+    // you can still add new entries here over time if you see them in logs
   };
-
-  // Words that we consider "too harsh to bother with" and just drop,
-  // *even if* they appear in some unexpected form. Broad pattern.
-  const FORCE_DROP = [
-    /\brape(d|s|ing)?\b/i,
-  ];
-
-  // Early skip: if the whole title is dominated by something we don't want to touch,
-  // you can choose to skip it entirely:
-  if (FORCE_DROP.some((re) => re.test(title))) {
-    return null;
-  }
 
   // Tokenize on spaces, keep punctuation loosely attached for readability
   const rawWords = title.split(/\s+/).filter(Boolean);
@@ -113,11 +120,10 @@ function softenTitleForPrompt(title: string): string | null {
     }
 
     if (typeof mapped === "string") {
-      // Replace with conceptual phrase; keep punctuation from original if you want,
-      // but simplest is just push the replacement as a separate token.
+      // Replace with conceptual phrase
       softenedWords.push(mapped);
     } else {
-      // Not in the harsh map: keep the word as-is
+      // Not in the harsh map: keep the original word
       softenedWords.push(raw);
     }
   }
