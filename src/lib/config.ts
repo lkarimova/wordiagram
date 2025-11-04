@@ -89,14 +89,14 @@ export const config = (() => {
     // Breaking news detection thresholds (LOWERED)
     breakingRules: {
       world: {
-        minItems: 3,        // At least 2 items in cluster (was 3)
-        minSources: 2,      // From at least 2 different sources
+        minItems: 5,        // At least 2 items in cluster (was 3)
+        minSources: 3,      // From at least 2 different sources
         recencyBoost: 0.9,  // OR very recent (within ~1 hour) with 2+ items
       },
     },
 
     // Headline change threshold (LOWERED to 20%)
-    headlineChangeThreshold: 0.3, // 20% change triggers clustering check (was 0.3)
+    headlineChangeThreshold: 0.5, // 20% change triggers clustering check (was 0.3)
 
     // Fixed style prompt (symbolic, balanced colors, no recognizable people/flags)
     style: {

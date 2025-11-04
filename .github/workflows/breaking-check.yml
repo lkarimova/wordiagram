@@ -1,10 +1,10 @@
 # .github/workflows/breaking-check.yml
-name: Breaking News Check (Every 15 min)
+name: Breaking News Check (Every 30 min)
 
 on:
   schedule:
     # Every 15 minutes
-    - cron: "*/15 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 jobs:
