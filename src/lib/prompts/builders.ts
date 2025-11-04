@@ -163,8 +163,9 @@ export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
     
     // Content from world news - emphasize metaphorical interpretation
     motifs
-    ? `Visual content: Create a cohesive symbolic painting that ${motifs}.`,
-    : "Use metaphorical imagery inspired by dreams, myths, folklore, fantasy literature, and cinema.",
+    ? `Visual content: Create a cohesive symbolic painting that ${motifs}.`
+    : "Visual content: Create a cohesive symbolic painting that explores change, fragility, and the interconnected lives of people and places through symbolic, dreamlike imagery.",
+    "Use metaphorical imagery inspired by dreams, myths, folklore, fantasy literature, and cinema.",
     "Favor poetic symbolism: objects, colors, animals, plants, settings, and/or characters, derived from the news themes; atmospheric effects.",
     "Do not rely repeatedly on the same visual clichés. Seek fresh symbolic combinations instead.",
     "CRITICAL: Absolutely no recognizable people, no real country flags, no literal war imagery (guns, tanks, arrows), no skulls, no earth globes.",
