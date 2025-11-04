@@ -26,7 +26,7 @@ export default async function ArchivePage() {
 
               // Show full datetime for clarity
               const label = p.created_at
-                ? formatInTimeZone(new Date(p.created_at), TZ, "yyyy-MM-dd '•' HH:mm")
+                ? formatInTimeZone(new Date(p.created_at), TZ, "MMM d, yyyy • HH:mm 'ET'")
                 : p.date;
 
               return (
