@@ -91,7 +91,7 @@ export const config = (() => {
       world: {
         minItems: 5,        // At least 2 items in cluster (was 3)
         minSources: 3,      // From at least 2 different sources
-        recencyBoost: 0.9,  // OR very recent (within ~1 hour) with 2+ items
+        recencyBoost: 0.95,  // OR very recent (within ~1 hour) with 2+ items
       },
     },
 

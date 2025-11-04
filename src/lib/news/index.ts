@@ -166,7 +166,7 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   }));
 
   // Step 2: Greedy semantic clustering
-  const similarityThreshold = 0.75; // tune as needed
+  const similarityThreshold = 0.8; // tune as needed
 
   type InternalCluster = {
     centroid: number[];
