@@ -27,38 +27,6 @@ function logErr(ctx: string, err: unknown) {
   console.error(`[news] ${ctx}`, (err as Error)?.message ?? err);
 }
 
-// Simple stop-words
-const STOP = new Set([
-  'the','a','an','of','and','or','to','in','on','for','with','as','by','from','at','over','after','amid',
-  'new','latest','update','breaking','this','that','is','are','was','were','will','could','may','might',
-  'how','why','what','when','where','who','into','about','between','across','under','vs','vs.'
-]);
-
-function extractKeywords(titles: string[], max = 15): string[] {
-  const freq = new Map<string, number>();
-  for (const t of titles) {
-    const words = t.toLowerCase()
-      .replace(/["""''`()]/g, '')
-      .replace(/[^a-z0-9\- ]+/g, ' ')
-      .split(/\s+/)
-      .filter(Boolean);
-    for (let i = 0; i < words.length; i++) {
-      const w = words[i];
-      if (STOP.has(w) || w.length < 3) continue;
-      // boost hyphenated compounds and bigrams
-      const bigram = i < words.length - 1 ? `${w} ${words[i+1]}` : null;
-      if (bigram && !STOP.has(words[i+1]) && words[i+1].length >= 3) {
-        freq.set(bigram, (freq.get(bigram) || 0) + 2);
-      }
-      freq.set(w, (freq.get(w) || 0) + 1);
-    }
-  }
-  return [...freq.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, max)
-    .map(([k]) => k);
-}
-
 function recencyScore(iso?: string): number {
   if (!iso) return 0.5;
   const t = Date.parse(iso);
@@ -78,7 +46,24 @@ function cosineSimilarity(a: number[], b: number[]): number {
     normA += a[i] * a[i];
     normB += b[i] * b[i];
   }
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+  const denom = Math.sqrt(normA) * Math.sqrt(normB);
+  if (denom === 0) return 0;
+  return dotProduct / denom;
+}
+
+function computeCentroid(vectors: number[][]): number[] {
+  if (!vectors.length) return [];
+  const dim = vectors[0].length;
+  const centroid = new Array(dim).fill(0);
+  for (const v of vectors) {
+    for (let i = 0; i < dim; i++) {
+      centroid[i] += v[i];
+    }
+  }
+  for (let i = 0; i < dim; i++) {
+    centroid[i] /= vectors.length;
+  }
+  return centroid;
 }
 
 // ---------- RSS fetch ----------
@@ -106,7 +91,8 @@ async function fetchRss(url: string): Promise<NewsItem[]> {
 }
 
 // ---------- Embeddings ----------
-async function getEmbeddings(texts: string[]): Promise<number[][]> {
+async function getEmbeddings(texts: string[]): Promise<number[][] | null> {
+  if (!texts.length) return [];
   try {
     const response = await openai.embeddings.create({
       model: 'text-embedding-3-small',
@@ -115,7 +101,7 @@ async function getEmbeddings(texts: string[]): Promise<number[][]> {
     return response.data.map(d => d.embedding);
   } catch (err) {
     logErr('Embeddings API error', err);
-    return [];
+    return null;
   }
 }
 
@@ -136,19 +122,26 @@ export async function fetchWorldNews(): Promise<NewsItem[]> {
   return dedupeByUrl(batches.flat());
 }
 
-/** Hybrid clustering: keyword-based first pass, then embeddings refinement */
+/**
+ * Purely semantic clustering based on embeddings + cosine similarity.
+ * Greedy algorithm:
+ *  - Compute embedding per headline
+ *  - For each item, assign to the most similar existing cluster if similarity >= threshold
+ *  - Otherwise, start a new cluster
+ */
 export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   if (!items.length) return [];
 
   console.log(`[clustering] Processing ${items.length} items`);
 
-  // Step 1: Keyword-based clustering (fast, cheap)
-  const keywords = extractKeywords(items.map(i => i.title), 15);
-  console.log(`[clustering] Extracted ${keywords.length} keywords:`, keywords);
+  // Step 1: Embeddings
+  const titles = items.map(i => i.title);
+  const embeddings = await getEmbeddings(titles);
 
-  if (!keywords.length) {
+  if (!embeddings || embeddings.length !== items.length) {
+    console.warn('[clustering] Embeddings unavailable or mismatched; returning single misc cluster');
     return [{
-      id: `world:misc`,
+      id: 'world:misc',
       kind: 'world',
       title: 'misc',
       items,
@@ -156,100 +149,99 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
     }];
   }
 
-  // Initial keyword buckets
-  const buckets = new Map<string, NewsItem[]>();
-  for (const k of keywords) buckets.set(k, []);
-  
-  for (const it of items) {
-    const t = it.title.toLowerCase();
-    const hit = keywords.find(k => t.includes(k));
-    buckets.get(hit || keywords[0])!.push(it);
+  type NewsItemWithEmbedding = NewsItem & { embedding: number[] };
+
+  const itemsWithEmbeddings: NewsItemWithEmbedding[] = items.map((item, idx) => ({
+    ...item,
+    embedding: embeddings[idx],
+  }));
+
+  // Step 2: Greedy semantic clustering
+  const similarityThreshold = 0.75; // tune as needed
+
+  type InternalCluster = {
+    centroid: number[];
+    items: NewsItemWithEmbedding[];
+  };
+
+  const internalClusters: InternalCluster[] = [];
+
+  for (const item of itemsWithEmbeddings) {
+    const emb = item.embedding;
+    if (!internalClusters.length) {
+      internalClusters.push({
+        centroid: emb.slice(),
+        items: [item],
+      });
+      continue;
+    }
+
+    let bestSim = -1;
+    let bestIndex = -1;
+
+    for (let i = 0; i < internalClusters.length; i++) {
+      const sim = cosineSimilarity(emb, internalClusters[i].centroid);
+      if (sim > bestSim) {
+        bestSim = sim;
+        bestIndex = i;
+      }
+    }
+
+    if (bestSim >= similarityThreshold && bestIndex >= 0) {
+      const cluster = internalClusters[bestIndex];
+      cluster.items.push(item);
+
+      // Incremental centroid update
+      const n = cluster.items.length;
+      const c = cluster.centroid;
+      for (let d = 0; d < c.length; d++) {
+        c[d] = c[d] + (emb[d] - c[d]) / n;
+      }
+    } else {
+      internalClusters.push({
+        centroid: emb.slice(),
+        items: [item],
+      });
+    }
   }
 
-  // Step 2: Embeddings-based refinement (semantic grouping)
-  try {
-    const titles = items.map(i => i.title);
-    const embeddings = await getEmbeddings(titles);
-    
-    if (embeddings.length === items.length) {
-      console.log('[clustering] Got embeddings, merging similar clusters');
-      
-      // Attach embeddings to items
-      items.forEach((item, i) => {
-        (item as any).embedding = embeddings[i];
-      });
+  // Step 3: Convert to public Cluster[] and score them
+  const clusters: Cluster[] = internalClusters
+    .filter(c => c.items.length > 0)
+    .map((c, idx) => {
+      const members = c.items;
+      const uniqueSources = new Set(members.map(m => m.source || ''));
+      const recAvg = members.reduce((s, m) => s + recencyScore(m.publishedAt), 0) / members.length;
+      const score = members.length * 2 + uniqueSources.size * 1.5 + recAvg;
 
-      // Merge clusters that are semantically similar (cosine similarity > 0.75)
-      const mergedBuckets = new Map<string, NewsItem[]>();
-      const processed = new Set<string>();
-
-      for (const [key1, items1] of buckets.entries()) {
-        if (processed.has(key1) || !items1.length) continue;
-        
-        const merged = [...items1];
-        processed.add(key1);
-
-        // Calculate centroid for this cluster
-        const centroid = new Array((items1[0] as any).embedding.length).fill(0);
-        items1.forEach(item => {
-          const emb = (item as any).embedding;
-          emb.forEach((val: number, i: number) => centroid[i] += val);
-        });
-        centroid.forEach((_, i) => centroid[i] /= items1.length);
-
-        // Check similarity with other clusters
-        for (const [key2, items2] of buckets.entries()) {
-          if (processed.has(key2) || key1 === key2 || !items2.length) continue;
-          
-          // Calculate centroid for second cluster
-          const centroid2 = new Array((items2[0] as any).embedding.length).fill(0);
-          items2.forEach(item => {
-            const emb = (item as any).embedding;
-            emb.forEach((val: number, i: number) => centroid2[i] += val);
-          });
-          centroid2.forEach((_, i) => centroid2[i] /= items2.length);
-
-          const similarity = cosineSimilarity(centroid, centroid2);
-          
-          if (similarity > 0.75) {
-            console.log(`[clustering] Merging "${key1}" + "${key2}" (similarity: ${similarity.toFixed(2)})`);
-            merged.push(...items2);
-            processed.add(key2);
-          }
+      // Pick representative title: item whose embedding is closest to cluster centroid
+      let repTitle = members[0].title;
+      let bestSim = -1;
+      for (const m of members) {
+        const sim = cosineSimilarity(m.embedding, c.centroid);
+        if (sim > bestSim) {
+          bestSim = sim;
+          repTitle = m.title;
         }
-
-        mergedBuckets.set(key1, merged);
       }
 
-      // Use merged buckets
-      buckets.clear();
-      mergedBuckets.forEach((items, key) => buckets.set(key, items));
-    }
-  } catch (err) {
-    console.warn('[clustering] Embeddings failed, using keyword-only clustering:', err);
-  }
-
-  // Step 3: Score and sort clusters
-  const clusters: Cluster[] = [];
-  for (const [key, members] of buckets.entries()) {
-    if (!members.length) continue;
-    const uniqueSources = new Set(members.map(m => m.source || ''));
-    const recAvg = members.reduce((s, m) => s + recencyScore(m.publishedAt), 0) / members.length;
-    const score = members.length * 2 + uniqueSources.size * 1.5 + recAvg;
-
-    clusters.push({
-      id: `world:${key}`,
-      kind: 'world',
-      title: key,
-      items: members,
-      score
-    } as Cluster);
-  }
+      return {
+        id: `world:${idx}`,
+        kind: 'world',
+        title: repTitle,
+        items: members, // extra embedding field is fine structurally
+        score,
+      } as Cluster;
+    });
 
   const sorted = clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
-  console.log(`[clustering] Created ${sorted.length} clusters, top 3:`, 
-    sorted.slice(0, 3).map(c => `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`));
-  
+  console.log(
+    `[clustering] Created ${sorted.length} semantic clusters, top 3:`,
+    sorted
+      .slice(0, 3)
+      .map(c => `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`)
+  );
+
   return sorted;
 }
 
@@ -267,7 +259,9 @@ export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {
       (maxRecency >= recencyBoost && c.items.length >= 2);
     
     if (isBreaking) {
-      console.log(`[breaking] Detected: "${c.title}" - ${c.items.length} items from ${sources.size} sources (recency: ${maxRecency.toFixed(2)})`);
+      console.log(
+        `[breaking] Detected: "${c.title}" - ${c.items.length} items from ${sources.size} sources (recency: ${maxRecency.toFixed(2)})`
+      );
       out.push({
         kind: 'world',
         clusterId: c.id,
@@ -300,8 +294,10 @@ export function hasSignificantNewsChange(
   const overlap = currentHeadlines.filter(h => lastSet.has(h)).length;
   const changeRatio = 1 - (overlap / Math.max(currentHeadlines.length, 1));
   
-  console.log(`[headlines] Change ratio: ${(changeRatio * 100).toFixed(1)}% (threshold: ${(config.headlineChangeThreshold * 100)}%) - comparing to last image`);
+  console.log(
+    `[headlines] Change ratio: ${(changeRatio * 100).toFixed(1)}% (threshold: ${(config.headlineChangeThreshold * 100)}%) - comparing to last image`
+  );
   
-  // Significant if >20% of headlines are new compared to last image
+  // Significant if > threshold of headlines are new compared to last image
   return changeRatio > config.headlineChangeThreshold;
 }
