@@ -65,8 +65,8 @@ export const config = (() => {
   return {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
-      dailyHourLocal: 6, // 6:00 AM ET
-      breakingCheckMinutes: 30, // Check every 30 minutes for breaking news
+      dailyHourLocal: 6,         // 6:00 AM ET
+      breakingCheckMinutes: 30,  // Check every 30 minutes for breaking news
     },
     aspect,
 
@@ -86,22 +86,17 @@ export const config = (() => {
       cacheMinutes: 30, // Cache news for 30 minutes
     },
 
-    // Breaking news detection thresholds (LOWERED)
+    // Breaking news detection thresholds
     breakingRules: {
       world: {
         minItems: 5,        // At least 5 items in cluster
         minSources: 3,      // From at least 3 different sources
-        recencyBoost: 0.95,  // OR very recent (within ~1 hour) with 3+ items
+        recencyBoost: 0.95, // OR very recent with 3+ items
       },
     },
 
     // Headline change threshold
-    headlineChangeThreshold: 0.5, // 50% change triggers clustering check (was 0.3)
-
-    // Fixed style prompt (symbolic, balanced colors, no recognizable people/flags)
-    style: {
-      prompt: "Symbolic oil painting with dreamlike, mythological imagery. Use two dominant colors (varied each time - choose from warm tones, cool tones, earth tones, or jewel tones) balanced with a full spectrum of supporting hues. Soft, diffused lighting with gentle contrast. Rich impasto texture. Draw inspiration from surrealist dreams, mythology, folklore, fantasy literature, and cinematic symbolism. Favor poetic symbolism: objects, colors, animals, settings, and/or characters, derived from the news themes; atmospheric effects. Do not rely repeatedly on the same visual clichés. Seek fresh symbolic combinations instead. CRITICAL: Absolutely no recognizable people, no real country flags (invented abstract flags are acceptable), no literal war imagery (guns, tanks, arrows), no skulls, no earth globes. Museum-quality presentation with ornate frame.",
-    },
+    headlineChangeThreshold: 0.5, // 50% change triggers clustering check
 
     storage: {
       publicPrefix: "world-news-painting",

@@ -66,6 +66,79 @@ function computeCentroid(vectors: number[][]): number[] {
   return centroid;
 }
 
+// Heuristic: turn a full news headline into a short "event phrase"
+// e.g. "Peru cuts diplomatic ties with Mexico over ex-PM's asylum claim"
+//   -> "Peru cuts diplomatic ties"
+//      "Five climbers and two guides killed in Nepal avalanche, say officials"
+//   -> "climbers and two guides killed"
+function extractEventPhrase(headline: string): string {
+  if (!headline) return "";
+
+  let t = headline.trim();
+
+  // 1) Remove trailing attribution like ", says X", ", say officials", "according to ..."
+  t = t.replace(
+    /,?\s*(says?|said|say|according to|report(?:s|ed)?|officials say).*$/i,
+    ""
+  );
+
+  // 2) Cut at question/exclamation if present
+  t = t.split(/[?!]/)[0];
+
+  // 3) Cut at colon or spaced dash/em dash to keep first clause
+  //    (don't split on hyphens inside words like "ex-top")
+  t = t.split(/:|\s[–—-]\s/)[0].trim();
+
+  // 4) Remove leading quantifier phrases ("At least", "More than", etc.)
+  t = t.replace(/^(at least|more than|over|about|around)\s+/i, "");
+
+  // 5) Remove leading pure number ("5 killed..." -> "killed...")
+  t = t.replace(/^\d+\s+/, "");
+
+  // 6) Split into words for further trimming
+  let words = t.split(/\s+/).filter(Boolean);
+
+  // Remove leading count words like "Five", "Dozens", "Hundreds"
+  const leadingCounts = new Set([
+    "one","two","three","four","five","six","seven","eight","nine","ten",
+    "dozens","scores","hundreds","thousands"
+  ]);
+  if (words.length && leadingCounts.has(words[0].toLowerCase())) {
+    words = words.slice(1);
+  }
+
+  // 7) Truncate at certain prepositions once we have a minimal phrase
+  //    This tends to give "Peru cuts diplomatic ties" instead of
+  //    "Peru cuts diplomatic ties with Mexico over ..."
+  const stopWords = new Set([
+    "with","over","after","amid","as","while","during","because","following",
+    "from","against","in"
+  ]);
+
+  let cutIdx: number | null = null;
+  for (let i = 0; i < words.length; i++) {
+    const w = words[i].toLowerCase();
+    if (stopWords.has(w) && i >= 3) {
+      cutIdx = i;
+      break;
+    }
+  }
+  if (cutIdx !== null) {
+    words = words.slice(0, cutIdx);
+  }
+
+  // 8) Drop some common adverbs that clutter the phrase
+  const drop = new Set(["partially","reportedly","allegedly"]);
+  words = words.filter(w => !drop.has(w.toLowerCase()));
+
+  // 9) Limit to at most 8 words
+  if (words.length > 8) {
+    return words.slice(0, 8).join(" ") + "…";
+  }
+
+  return words.join(" ");
+}
+
 // ---------- RSS fetch ----------
 async function fetchRss(url: string): Promise<NewsItem[]> {
   try {
@@ -237,7 +310,7 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
       return {
         id: `world:${idx}`,
         kind: 'world',
-        title: repTitle,
+        title: extractEventPhrase(repTitle),
         items: members,
         score,
       } as Cluster;
