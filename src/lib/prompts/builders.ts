@@ -28,8 +28,9 @@ export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
     // Content from world news - emphasize metaphorical interpretation
     `Visual content: Create a cohesive symbolic painting that ${motifs}.`,
     "Use metaphorical imagery inspired by dreams, myths, folklore, fantasy literature, and cinema.",
-    "Favor poetic symbolism: celestial bodies, natural phenomena, mysterious vessels, ethereal creatures, architectural fragments, botanical elements, atmospheric effects.",
-    "Avoid literal depictions: no recognizable people, no real country flags (invented symbolic flags are acceptable), no literal war imagery (guns, tanks, arrows), no skulls, no earth globes.",
+    "Favor poetic symbolism: objects, colors, animals, settings, and/or characters, derived from the news themes; atmospheric effects.",
+    "CRITICAL: Absolutely no recognizable people, no real country flags (invented abstract flags are acceptable), no literal war imagery (guns, tanks, arrows), no skulls, no earth globes.",
+    "Do not depict any flags that exist in reality. If flags must appear, they should be completely abstract, fantastical designs with impossible color combinations.",
     "Maintain cultural and political neutrality through symbolic abstraction.",
     
     // Color guidance
@@ -46,12 +47,15 @@ export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
     "text, letters, numbers, captions, UI elements, watermarks, logos",
     "charts, diagrams, graphs, infographics",
     "real identifiable people, photographs of people, portraits, faces",
-    "flags of real countries, national symbols",
-    "literal war imagery, guns, tanks, weapons, arrows, missiles",
+    "flags, national flags, country flags, state flags, banners with national symbols",
+    "real flags of any country including USA, UK, France, Germany, China, Russia, Japan, India, Brazil, etc",    "literal war imagery, guns, tanks, weapons, arrows, missiles",
+    "recognizable national symbols, coat of arms, national emblems",
+    "literal war imagery, guns, tanks, weapons, arrows, missiles, bombs, explosions",
     "skulls, skeletons, death imagery",
     "earth globes, world maps, literal geographic representations",
     "graphic violence, medical imagery, disaster photos",
     "oversaturated colors, harsh contrast, dark shadows",
+    "photorealistic flags, realistic national insignia",
   ].join(", ");
 
   return { prompt, negative_prompt };
