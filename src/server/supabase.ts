@@ -139,3 +139,14 @@ export async function updatePainting(id: string, updates: Partial<DailyPainting>
   if (error) throw error;
   return data as DailyPainting;
 }
+
+export async function getPaintingByCreatedAt(createdAt: string) {
+  const { data, error } = await anon()
+    .from("daily_paintings")
+    .select("*")
+    .eq("created_at", createdAt)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as DailyPainting | null;
+}
