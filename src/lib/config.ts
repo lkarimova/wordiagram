@@ -83,15 +83,15 @@ export const config = (() => {
               .map(s => s.trim())
               .filter(Boolean)
           : WORLD_FALLBACK,
-      cacheMinutes: 30, // Cache news for 30 minutes
+      cacheMinutes: 30, // Cache news for 60 minutes
     },
 
     // Breaking news detection thresholds
     breakingRules: {
       world: {
-        minItems: 5,        // At least 5 items in cluster
-        minSources: 3,      // From at least 3 different sources
-        recencyBoost: 0.95, // OR very recent with 3+ items
+        minItems: 7,        // At least 7 items in cluster
+        minSources: 5,      // From at least 5 different sources
+        recencyBoost: 0.95, // OR very recent with 7+ items
       },
     },
 
