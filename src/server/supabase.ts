@@ -83,6 +83,96 @@ export async function getLatestPaintingForDate(date: string) {
   return data as DailyPainting | null;
 }
 
+// ──────────────────────────────────────────────────────────────────────────────
+// DEBUG HELPER: lookup by local ET minute
+// This is only used for admin debug endpoints, not for core app behavior.
+
+/**
+ * Convert an ET "minute" (YYYY-MM-DDTHH:mm in America/New_York) into
+ * a UTC ISO start/end range for that minute.
+ *
+ * NOTE: This uses a simple month-based DST approximation:
+ *   - months 4–10 (Apr–Oct) → EDT (UTC-4)
+ *   - other months → EST (UTC-5)
+ * Good enough for admin/debug.
+ */
+function localMinuteToUtcRange(localMinute: string): {
+  startIso: string;
+  endIso: string;
+} {
+  // Expect "YYYY-MM-DDTHH:mm"
+  const [datePart, timePart] = localMinute.split("T");
+  if (!datePart || !timePart) {
+    throw new Error(
+      `Invalid localMinute format (expected YYYY-MM-DDTHH:mm): ${localMinute}`
+    );
+  }
+
+  const [yearStr, monthStr, dayStr] = datePart.split("-");
+  const [hourStr, minuteStr] = timePart.split(":");
+
+  const year = Number(yearStr);
+  const month = Number(monthStr); // 1–12
+  const day = Number(dayStr);
+  const hour = Number(hourStr);
+  const minute = Number(minuteStr);
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    !Number.isFinite(day) ||
+    !Number.isFinite(hour) ||
+    !Number.isFinite(minute)
+  ) {
+    throw new Error(`Invalid localMinute components: ${localMinute}`);
+  }
+
+  // Simple DST approximation:
+  // months 4–10 (Apr–Oct) → UTC-4, others UTC-5
+  const isDstApprox = month >= 4 && month <= 10;
+  const offsetHours = isDstApprox ? 4 : 5;
+
+  // local ET time is UTC - offset → UTC = local + offset
+  const utcStartMs = Date.UTC(
+    year,
+    month - 1,
+    day,
+    hour + offsetHours,
+    minute,
+    0,
+    0
+  );
+  const utcEndMs = utcStartMs + 60 * 1000; // +1 minute
+
+  return {
+    startIso: new Date(utcStartMs).toISOString(),
+    endIso: new Date(utcEndMs).toISOString(),
+  };
+}
+
+/**
+ * Get the latest painting whose created_at falls within a specific ET minute.
+ * localMinute should be in format "YYYY-MM-DDTHH:mm" in America/New_York time,
+ * matching what you see on the UI (date + hour:minute).
+ */
+export async function getPaintingByLocalCreatedMinute(
+  localMinute: string
+): Promise<DailyPainting | null> {
+  const { startIso, endIso } = localMinuteToUtcRange(localMinute);
+
+  const { data, error } = await anon()
+    .from("daily_paintings")
+    .select("*")
+    .gte("created_at", startIso)
+    .lt("created_at", endIso)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as DailyPainting | null;
+}
+
 /** List archive: all images per day */
 export async function listArchive(limit = 90) {
   const { data, error } = await anon()
