@@ -1,6 +1,6 @@
 // src/server/supabase.ts
 import { createClient } from "@supabase/supabase-js";
-import { formatInTimeZone } from "date-fns-tz";
+import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
 const TZ = "America/New_York";
 
 const URL = process.env.SUPABASE_URL!;
@@ -156,6 +156,37 @@ export async function getPaintingById(id: string) {
     .from("daily_paintings")
     .select("*")
     .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as DailyPainting | null;
+}
+/** 
+ * Get the latest painting whose created_at falls within a specific ET minute.
+ * localMinute should be in format "YYYY-MM-DDTHH:mm" in America/New_York time.
+ */
+export async function getPaintingByLocalCreatedMinute(localMinute: string) {
+  // Expect "2025-11-05T12:25"
+  const localWithSeconds = `${localMinute}:00`;
+
+  let startUtc: Date;
+  try {
+    // Interpret the string as time in America/New_York
+    startUtc = zonedTimeToUtc(localWithSeconds, TZ);
+  } catch (e) {
+    throw new Error(`Invalid local created_at format: ${localMinute}`);
+  }
+
+  // End of that minute: +60 seconds
+  const endUtc = new Date(startUtc.getTime() + 60 * 1000);
+
+  const { data, error } = await anon()
+    .from("daily_paintings")
+    .select("*")
+    .gte("created_at", startUtc.toISOString())
+    .lt("created_at", endUtc.toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) throw error;
