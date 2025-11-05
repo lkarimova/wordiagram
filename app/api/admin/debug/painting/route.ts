@@ -4,7 +4,7 @@ import { basicAuth } from "@/lib/utils/auth";
 import {
   getPaintingById,
   getLatestPaintingForDate,
-  getPaintingByCreatedAt,
+  getPaintingByLocalCreatedMinute,
 } from "@/src/server/supabase";
 
 export const runtime = "nodejs";
@@ -16,14 +16,14 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
   const date = url.searchParams.get("date");
-  const created = url.searchParams.get("created_at"); // full ISO timestamp
+  const createdLocal = url.searchParams.get("created_at"); // full ISO timestamp
 
-  if (!id && !date && !created) {
+  if (!id && !date && !createdLocal) {
     return NextResponse.json(
       {
         ok: false,
         error:
-          "Provide one of: ?id=<painting-id> or ?date=YYYY-MM-DD or ?created_at=ISO_TIMESTAMP",
+          "Provide one of: ?id=<painting-id> or ?date=YYYY-MM-DD or ?created_at=YYYY-MM-DDTHH:mm (ET)",
       },
       { status: 400 }
     );
@@ -33,8 +33,8 @@ export async function GET(req: NextRequest) {
 
   if (id) {
     row = await getPaintingById(id);
-  } else if (created) {
-    row = await getPaintingByCreatedAt(created);
+  } else if (createdLocal) {
+    row = await getPaintingByLocalCreatedMinute(createdLocal);
   } else if (date) {
     // latest painting for that date (daily or breaking)
     row = await getLatestPaintingForDate(date);
