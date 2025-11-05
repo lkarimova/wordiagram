@@ -150,3 +150,14 @@ export async function getPaintingByCreatedAt(createdAt: string) {
   if (error) throw error;
   return data as DailyPainting | null;
 }
+
+export async function getPaintingById(id: string) {
+  const { data, error } = await anon()
+    .from("daily_paintings")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as DailyPainting | null;
+}
