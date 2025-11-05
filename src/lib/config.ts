@@ -66,7 +66,7 @@ export const config = (() => {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
       dailyHourLocal: 6,         // 6:00 AM ET
-      breakingCheckMinutes: 30,  // Check every 30 minutes for breaking news
+      breakingCheckMinutes: 60,  // Check every 60 minutes for breaking news
     },
     aspect,
 
@@ -83,7 +83,7 @@ export const config = (() => {
               .map(s => s.trim())
               .filter(Boolean)
           : WORLD_FALLBACK,
-      cacheMinutes: 30, // Cache news for 60 minutes
+      cacheMinutes: 60, // Cache news for 60 minutes
     },
 
     // Breaking news detection thresholds
