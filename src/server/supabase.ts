@@ -1,6 +1,6 @@
 // src/server/supabase.ts
 import { createClient } from "@supabase/supabase-js";
-import { formatInTimeZone, zonedTimeToUtc } from "date-fns-tz";
+import { formatInTimeZone } from "date-fns-tz";
 const TZ = "America/New_York";
 
 const URL = process.env.SUPABASE_URL!;
@@ -185,6 +185,72 @@ export async function getPaintingByLocalCreatedMinute(localMinute: string) {
     .select("*")
     .gte("created_at", startUtc.toISOString())
     .lt("created_at", endUtc.toISOString())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as DailyPainting | null;
+}
+
+/**
+ * Convert an "ET minute" (YYYY-MM-DDTHH:mm in America/New_York) into
+ * a UTC start/end ISO range for that minute.
+ * NOTE: Simple month-based DST approximation (good enough for admin/debug).
+ */
+function localMinuteToUtcRange(localMinute: string): { startIso: string; endIso: string } {
+  // Expect "2025-11-05T12:25"
+  const [datePart, timePart] = localMinute.split("T");
+  if (!datePart || !timePart) {
+    throw new Error(`Invalid localMinute format (expected YYYY-MM-DDTHH:mm): ${localMinute}`);
+  }
+
+  const [yearStr, monthStr, dayStr] = datePart.split("-");
+  const [hourStr, minuteStr] = timePart.split(":");
+
+  const year = Number(yearStr);
+  const month = Number(monthStr); // 1-12
+  const day = Number(dayStr);
+  const hour = Number(hourStr);
+  const minute = Number(minuteStr);
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    !Number.isFinite(day) ||
+    !Number.isFinite(hour) ||
+    !Number.isFinite(minute)
+  ) {
+    throw new Error(`Invalid localMinute components: ${localMinute}`);
+  }
+
+  // Very simple DST approximation:
+  // - months 4–10 (Apr–Oct) → EDT (UTC-4)
+  // - other months → EST (UTC-5)
+  const isDstApprox = month >= 4 && month <= 10;
+  const offsetHours = isDstApprox ? 4 : 5; // local = UTC - offset → UTC = local + offset
+
+  const utcStartMs = Date.UTC(year, month - 1, day, hour + offsetHours, minute, 0, 0);
+  const utcEndMs = utcStartMs + 60 * 1000; // +1 minute
+
+  return {
+    startIso: new Date(utcStartMs).toISOString(),
+    endIso: new Date(utcEndMs).toISOString(),
+  };
+}
+
+/** 
+ * Get the latest painting whose created_at falls within a specific ET minute.
+ * localMinute should be in format "YYYY-MM-DDTHH:mm" in America/New_York time.
+ */
+export async function getPaintingByLocalCreatedMinute(localMinute: string) {
+  const { startIso, endIso } = localMinuteToUtcRange(localMinute);
+
+  const { data, error } = await anon()
+    .from("daily_paintings")
+    .select("*")
+    .gte("created_at", startIso)
+    .lt("created_at", endIso)
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
