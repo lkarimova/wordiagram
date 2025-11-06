@@ -48,7 +48,8 @@ export async function runDailyGeneration() {
   console.log("[generate] saved image:", imgUrl);
 
   // 5) Prepare metadata
-  const themeSummary = generateThemeSummary(worldClusters);
+  const summaryClusters = worldClusters.slice(0, 10);
+  const themeSummary = generateThemeSummary(summaryClusters);
   const headlinesList = listHeadlines(world, 20);
 
   const debug = {
@@ -62,13 +63,26 @@ export async function runDailyGeneration() {
       source: i.source,
       publishedAt: i.publishedAt,
     })),
-    clustersPicked: worldClusters.slice(0, 10).map(c => ({
+    clustersPicked: summaryClusters.map(c => ({
       title: c.title,
       size: c.items.length,
       score: c.score,
     })),
     generatedAt: nowTimestamp(),
   };
+
+  // Build sources list from the same clusters used in the summary/debug
+  const summaryWorldItems: any[] = [];
+  const seenUrls = new Set<string>();
+
+  for (const cluster of summaryClusters) {
+    for (const item of cluster.items) {
+      if (!item?.url) continue;
+      if (seenUrls.has(item.url)) continue;
+      seenUrls.add(item.url);
+      summaryWorldItems.push(item);
+    }
+  }
 
   // 6) Save to database
   const row = await insertDailyPainting({
@@ -82,7 +96,7 @@ export async function runDailyGeneration() {
       debug 
     },
     sources: {
-      world: world.slice(0, 20).map(i => ({
+      world: summaryWorldItems.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,
@@ -136,6 +150,7 @@ export async function runBreakingGeneration(params: {
   console.log("[breaking] saved image:", imgUrl);
 
   // 4) Prepare metadata
+  const summaryClusters = activeClusters.slice(0, 10);
   const baseSummary = generateThemeSummary(activeClusters);
   const themeSummary = `BREAKING: ${baseSummary}`;
 
@@ -153,7 +168,7 @@ export async function runBreakingGeneration(params: {
       source: i.source,
       publishedAt: i.publishedAt,
     })),
-    clustersPicked: activeClusters.slice(0, 10).map((c: any) => ({
+    clustersPicked: summaryClusters.map(c => ({
       title: (c.title || "").trim(),
       size: c.items.length,
       score: c.score,
@@ -161,6 +176,18 @@ export async function runBreakingGeneration(params: {
     generatedAt: timestamp,
   };
 
+  // Build sources list from the same clusters used in the summary/debug
+  const summaryWorldItems: any[] = [];
+  const seenUrls = new Set<string>();
+
+  for (const cluster of summaryClusters) {
+    for (const item of cluster.items) {
+      if (!item?.url) continue;
+      if (seenUrls.has(item.url)) continue;
+      seenUrls.add(item.url);
+      summaryWorldItems.push(item);
+    }
+  }
 
   // 5) Save to database
   const row = await insertDailyPainting({
@@ -174,7 +201,7 @@ export async function runBreakingGeneration(params: {
       debug 
     },
     sources: {
-      world: world.slice(0, 20).map(i => ({
+      world: summaryWorldItems.slice(0, 20).map(i => ({
         title: i.title,
         url: i.url,
         source: i.source,

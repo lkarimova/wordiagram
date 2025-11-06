@@ -46,13 +46,13 @@ export default async function Home() {
           <p className="mt-3 text-sm md:text-base text-neutral-700">
               <span className="italic">Wordiagram</span> signifies “news through
               writing” and “word drawing”.
-              <span className="italic"> Word</span> comes from Old English,
+              <span className="italic">{"{"}word{"}"}</span>{" "} comes from Old English,
               meaning “news”.
-              <span className="italic"> Dia</span> comes from Latin, meaning
+              <span className="italic">{"{"}dia{"}"}</span>{" "} comes from Latin, meaning
               “through”.
-              <span className="italic"> Gram</span> comes from Greek{" "}
-              <span className="italic">“graphein”</span>, meaning “to write”.
-              <span className="italic"> Diagram</span> means “simplified
+              <span className="italic">{"{"}gram{"}"}</span>{" "} comes from Greek
+              <span className="italic">Graphein</span>, meaning “to write”.
+              <span className="italic">Diagram</span> means “simplified
               drawing”.
               Wordiagram uses AI to translate the latest news headlines into writing, and then into a painting.
           </p>
