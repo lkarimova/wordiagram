@@ -394,6 +394,45 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   return sorted;
 }
 
+/** Decide which clusters are "breaking" by coverage/recency. */
+export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {
+  const out: BreakingDecision[] = [];
+  const { minItems, minSources, recencyBoost } = config.breakingRules.world;
+
+  for (const c of clusters) {
+    const sources = new Set(c.items.map(i => i.source || ""));
+    const recencies = c.items
+      .map(i => recencyScore(i.publishedAt))
+      .filter(r => Number.isFinite(r) && r > 0);
+
+    if (!recencies.length) continue;
+
+    const maxRecency = Math.max(...recencies);
+
+    const isBreaking =
+      (c.items.length >= minItems && sources.size >= minSources) ||
+      (maxRecency >= recencyBoost && c.items.length >= 2);
+
+    if (isBreaking) {
+      console.log(
+        `[breaking] Detected: "${c.title}" - ${c.items.length} items from ${sources.size} sources (recency: ${maxRecency.toFixed(
+          2
+        )})`
+      );
+      out.push({
+        kind: "world",
+        clusterId: c.id,
+        rationale: `size=${c.items.length}, sources=${sources.size}, recentBoost=${maxRecency.toFixed(
+          2
+        )}`,
+        sources: c.items.slice(0, 5).map(i => i.url),
+      });
+    }
+  }
+
+  return out;
+}
+
 /** 
  * Lightweight check: compare headlines to detect if news has changed significantly
  * Compares against headlines from the LAST GENERATED IMAGE, not just last check
