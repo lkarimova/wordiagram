@@ -151,7 +151,7 @@ export async function runBreakingGeneration(params: {
 
   // 4) Prepare metadata
   const summaryClusters = activeClusters.slice(0, 10);
-  const baseSummary = generateThemeSummary(activeClusters);
+  const baseSummary = generateThemeSummary(summaryClusters);
   const themeSummary = `BREAKING: ${baseSummary}`;
 
   const debug = {

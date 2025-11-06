@@ -221,7 +221,6 @@ export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
  */
 export function generateThemeSummary(clusters: Cluster[]): string {
   return clusters
-    .slice(0, 5)
     .map(c => (c.title || "").trim())
     .filter(Boolean)
     .join(" • ");
