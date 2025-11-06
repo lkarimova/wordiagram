@@ -11,7 +11,7 @@ const TZ = "America/New_York";
 type Props = { params: Promise<{ id: string }> };
 
 export default async function PaintingById({ params }: Props) {
-  const { id } = params;
+  const { id } = await params;
 
   const painting = await getPaintingById(id);
   if (!painting) {
