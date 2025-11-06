@@ -106,3 +106,4 @@ export default async function PaintingById({ params }: Props) {
         </div>
       </main>
     );
+  }
