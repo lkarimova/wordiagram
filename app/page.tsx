@@ -41,9 +41,9 @@ export default async function Home() {
     <main className="min-h-screen bg-white text-black">
       <div className="mx-auto px-4 py-10 flex flex-col items-center gap-6">
         {/* Title + description (always visible) */}
-        <header className="text-center max-w-2xl">
+        <header className="text-center max-w-2xl mb-6">
           <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
-          <p className="mt-3 text-sm md:text-base text-neutral-700">
+          <p className="mt-3 text-sm text-neutral-700">
               A real-time painting of the latest world news.
               <br />
               <span className="italic">Word</span> comes from Old English,
@@ -89,18 +89,20 @@ export default async function Home() {
         ) : null}
       </div>
 
-      <footer className="mt-8 mb-6 text-center text-xs text-neutral-500">
+      <footer className="mt-10 mb-10 text-xs text-neutral-500">
+       <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
         <p className="mt-1">
           Created with GitHub, Vercel, Cursor, Supabase, and OpenAI (gpt-image-1).
           <Link
             href="/process"
             className="underline underline-offset-2 hover:opacity-80"
           >
-            My Process
+          {" "} My Process
           </Link>
-          &rarr;
+          {" "} &rarr;
         </p>
         <p>© {new Date().getFullYear()} Liza Karimova</p>
+       </div>
       </footer>
     </main>
   );
