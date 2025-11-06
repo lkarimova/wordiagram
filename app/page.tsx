@@ -42,24 +42,19 @@ export default async function Home() {
       <div className="mx-auto px-4 py-10 flex flex-col items-center gap-6">
         {/* Title + description (always visible) */}
         <header className="text-center max-w-2xl">
-          <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
+          <h1 className="text-3xl md:text-4xl font-semibold">WORDIAGRAM</h1>
           <p className="mt-3 text-sm md:text-base text-neutral-700">
-            <span className="italic">[word-dia-gram]</span> means “news through
-            writing”, or “word drawing”.
-            <span className="block mt-1">
-              <span className="italic">[word]</span> comes from Old English,
+              <span className="italic">Wordiagram</span> signifies “news through
+              writing” and “word drawing”.
+              <span className="italic"> Word</span> comes from Old English,
               meaning “news”.
-              <span className="italic"> [dia]</span> comes from Latin, meaning
+              <span className="italic"> Dia</span> comes from Latin, meaning
               “through”.
-              <span className="italic"> [gram]</span>, from Greek{" "}
-              <span className="italic">“graphein”</span>, means “to write”.
-              <span className="italic"> [diagram]</span> today means “simplified
+              <span className="italic"> Gram</span> comes from Greek{" "}
+              <span className="italic">“graphein”</span>, meaning “to write”.
+              <span className="italic"> Diagram</span> means “simplified
               drawing”.
-            </span>
-            <span className="block mt-1">
-              This is appropriate, because Wordiagram uses AI to translate the
-              latest news headlines into writing, and then into a painting.
-            </span>
+              Wordiagram uses AI to translate the latest news headlines into writing, and then into a painting.
           </p>
         </header>
 

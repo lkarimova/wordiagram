@@ -18,6 +18,8 @@ export function NewsReveal({ clusters, children }: NewsRevealProps) {
       <div className="mt-1 flex justify-center gap-3">
         {children}
         {hasClusters && (
+        <>
+          <span>•</span>    
           <button
             type="button"
             onClick={() => setOpen((prev) => !prev)}

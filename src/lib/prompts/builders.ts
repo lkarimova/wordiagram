@@ -1,6 +1,5 @@
 // src/lib/prompts/builders.ts
 import type { ComposePromptResult, Cluster } from "../types";
-
 /**
  * Base style prompt for all news images.
  * Single source of truth lives here (not in config.ts).
@@ -223,7 +222,8 @@ export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
 export function generateThemeSummary(clusters: Cluster[]): string {
   return clusters
     .slice(0, 5)
-    .map(c => `${c.title} (${c.items.length} sources)`)
+    .map(c => (c.title || "").trim())
+    .filter(Boolean)
     .join(" • ");
 }
 

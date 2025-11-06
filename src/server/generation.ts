@@ -110,12 +110,14 @@ export async function runBreakingGeneration(params: {
 
   const { world, worldClusters, reason } = params;
 
-  // 1) Build prompt highlighting the breaking news
-  const breakingClusters = reason.world.map(d => 
-    worldClusters.find(c => c.id === d.clusterId)
-  ).filter(Boolean);
+    // 1) Build prompt highlighting the breaking news
+    const breakingClusters = reason.world
+    .map(d => worldClusters.find(c => c.id === d.clusterId))
+    .filter(Boolean);
 
-  const { prompt, negative_prompt } = buildNewsPrompt(breakingClusters.length > 0 ? breakingClusters : worldClusters);
+  const activeClusters = breakingClusters.length > 0 ? breakingClusters : worldClusters;
+
+  const { prompt, negative_prompt } = buildNewsPrompt(activeClusters);
   console.log("[breaking] prompt:", prompt.substring(0, 200) + "...");
 
   // 2) Generate new image
@@ -128,13 +130,14 @@ export async function runBreakingGeneration(params: {
 
   // 3) Save to storage with timestamp
   const imgUrl = await savePngToStorage(
-    `${dateStr}/breaking-${Date.now()}.png`, 
+    `${dateStr}/breaking-${Date.now()}.png`,
     image
   );
   console.log("[breaking] saved image:", imgUrl);
 
   // 4) Prepare metadata
-  const themeSummary = generateThemeSummary(breakingClusters.length > 0 ? breakingClusters : worldClusters);
+  const baseSummary = generateThemeSummary(activeClusters);
+  const themeSummary = `BREAKING: ${baseSummary}`;
 
   const debug = {
     date: dateStr,
@@ -150,20 +153,21 @@ export async function runBreakingGeneration(params: {
       source: i.source,
       publishedAt: i.publishedAt,
     })),
-    clustersPicked: worldClusters.slice(0, 10).map(c => ({
-      title: c.title,
+    clustersPicked: activeClusters.slice(0, 10).map((c: any) => ({
+      title: (c.title || "").trim(),
       size: c.items.length,
       score: c.score,
     })),
     generatedAt: timestamp,
   };
 
+
   // 5) Save to database
   const row = await insertDailyPainting({
     date: dateStr,
     image_url: imgUrl,
     prompt: { prompt, negative_prompt },
-    world_theme_summary: `BREAKING: ${themeSummary}`,
+    world_theme_summary: themeSummary,
     model_info: { 
       model: "gpt-image-1", 
       aspect: config.aspect, 
