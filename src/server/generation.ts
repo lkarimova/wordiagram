@@ -124,14 +124,28 @@ export async function runBreakingGeneration(params: {
 
   const { world, worldClusters, reason } = params;
 
-    // 1) Build prompt highlighting the breaking news
-    const breakingClusters = reason.world
+    // 1) Identify breaking clusters
+  const breakingClusters = reason.world
     .map(d => worldClusters.find(c => c.id === d.clusterId))
     .filter(Boolean);
 
-  const activeClusters = breakingClusters.length > 0 ? breakingClusters : worldClusters;
+  // 2) Build merged cluster list for the prompt:
+  //    breaking clusters first, then the rest of the world clusters
+  let mergedClusters: typeof worldClusters;
 
-  const { prompt, negative_prompt } = buildNewsPrompt(activeClusters);
+  if (breakingClusters.length > 0) {
+    const breakingIds = new Set(breakingClusters.map(c => c.id));
+    mergedClusters = [
+      ...breakingClusters,
+      ...worldClusters.filter(c => !breakingIds.has(c.id)),
+    ];
+  } else {
+    // Fallback: no specific breaking clusters, use all world clusters
+    mergedClusters = worldClusters;
+  }
+
+  // Prompt now sees breaking + global context (buildNewsPrompt will still slice internally)
+  const { prompt, negative_prompt } = buildNewsPrompt(mergedClusters);
   console.log("[breaking] prompt:", prompt.substring(0, 200) + "...");
 
   // 2) Generate new image
@@ -150,7 +164,7 @@ export async function runBreakingGeneration(params: {
   console.log("[breaking] saved image:", imgUrl);
 
   // 4) Prepare metadata
-  const summaryClusters = activeClusters.slice(0, 10);
+  const summaryClusters = mergedClusters.slice(0, 10);
   const baseSummary = generateThemeSummary(summaryClusters);
   const themeSummary = `BREAKING: ${baseSummary}`;
 

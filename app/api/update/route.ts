@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchWorldNews, rankAndCluster, detectBreaking, hasSignificantNewsChange } from "@/lib/news";
 import { runBreakingGeneration } from "@/server/generation";
+import { config } from "@/lib/config";
 
 export const runtime = "nodejs";
 
@@ -53,13 +54,22 @@ export async function POST(request: NextRequest) {
     const worldBreaking = detectBreaking(worldClusters);
     console.log("[update] Detected", worldBreaking.length, "breaking clusters");
 
-    if (worldBreaking.length === 0) {
-      console.log("[update] No breaking news criteria met");
-      return NextResponse.json({ 
-        ok: true, 
-        breaking: false, 
-        reason: "no-breaking-criteria" 
-      }, { status: 200 });
+    const minBreaking =
+    config.breakingRules.world.minBreakingClusters ?? 1;
+
+    if (worldBreaking.length < minBreaking) {
+      console.log(
+        `[update] Not enough breaking clusters: ${worldBreaking.length} < minBreaking=${minBreaking}`
+      );
+      return NextResponse.json(
+        {
+          ok: true,
+          breaking: false,
+          reason: "not-enough-breaking-clusters",
+          breakingCount: worldBreaking.length,
+        },
+        { status: 200 }
+      );
     }
 
     // Step 3: Generate new image for breaking news
