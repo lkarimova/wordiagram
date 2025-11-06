@@ -47,10 +47,11 @@ export default async function Home() {
               A real-time painting of the latest world news.
               <br />
               <span className="italic">Word</span> comes from Old English,
-              meaning “news”, and
-              <span className="italic">Diagram</span> comes from Latin
+              meaning “news”.
+              <br />
+              <span className="italic"> Diagram</span> comes from Latin
               <span className="italic"> {"{"}dia{"}"}</span>{" "} and
-              <span className="italic"> {"{"}graphein{"}"}</span>{" "}, meaning "through drawing".
+              <span className="italic"> {"{"}graphein{"}"}</span>, meaning "through drawing".
           </p>
         </header>
 
@@ -89,61 +90,17 @@ export default async function Home() {
       </div>
 
       <footer className="mt-8 mb-6 text-center text-xs text-neutral-500">
-        <p>© {new Date().getFullYear()} Liza Karimova</p>
         <p className="mt-1">
-          Created with{" "}
-          <a
-            href="https://github.com"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            GitHub
-          </a>
-          ,{" "}
-          <a
-            href="https://vercel.com"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            Vercel
-          </a>
-          ,{" "}
-          <a
-            href="https://cursor.sh"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            Cursor
-          </a>
-          ,{" "}
-          <a
-            href="https://supabase.com"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            Supabase
-          </a>
-          , and{" "}
-          <a
-            href="https://openai.com"
-            target="_blank"
-            rel="noreferrer"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-            OpenAI (gpt-image-1)
-          </a>
-          .{" "}
+          Created with GitHub, Vercel, Cursor, Supabase, and OpenAI (gpt-image-1).
           <Link
             href="/process"
             className="underline underline-offset-2 hover:opacity-80"
           >
-            My Process &rarr;
+            My Process
           </Link>
+          &rarr;
         </p>
+        <p>© {new Date().getFullYear()} Liza Karimova</p>
       </footer>
     </main>
   );
