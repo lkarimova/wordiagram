@@ -1,11 +1,12 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
-import Link from 'next/link';
-import Image from 'next/image';
-import Frame from '@/src/components/Frame';
-import { getLatestPainting } from '@/src/server/supabase';
-import { formatInTimeZone } from 'date-fns-tz';
-import { config } from '@/lib/config';
+import Link from "next/link";
+import Image from "next/image";
+import Frame from "@/src/components/Frame";
+import { getLatestPainting } from "@/src/server/supabase";
+import { formatInTimeZone } from "date-fns-tz";
+import { config } from "@/lib/config";
+import { NewsReveal } from "@/src/components/NewsReveal";
 
 export default async function Home() {
   const painting = await getLatestPainting();
@@ -13,19 +14,59 @@ export default async function Home() {
   // Fallback placeholder if nothing exists yet
   const imgUrl =
     painting?.image_url ||
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAI0lEQVQokWP8////fwYgYGBg+M9AgQGQ2QEUJgYFQ4g0g3EFAH5oAqK5nGxgAAAAASUVORK5CYII=';
+    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAMCAYAAABfnvydAAAAI0lEQVQokWP8////fwYgYGBg+M9AgQGQ2QEUJgYFQ4g0g3EFAH5oAqK5nGxgAAAAASUVORK5CYII=";
 
-  const tz = config.timezone || 'America/New_York';
+  const tz = config.timezone || "America/New_York";
   const stamp = painting?.created_at
-    ? formatInTimeZone(new Date(painting.created_at), tz, "MMM d, yyyy • HH:mm 'ET'")
-    : '';
+    ? formatInTimeZone(
+        new Date(painting.created_at),
+        tz,
+        "MMM d, yyyy • HH:mm 'ET'"
+      )
+    : "";
+
+  // Build cluster lines from world_theme_summary, stripping "(N sources)"
+  const clusterLines =
+    painting?.world_theme_summary
+      ?.split(" • ")
+      .map((part) =>
+        part
+          // remove trailing "(...)" if present
+          .replace(/\s*\([^)]*\)\s*$/, "")
+          .trim()
+      )
+      .filter(Boolean) ?? [];
 
   return (
     <main className="min-h-screen bg-white text-black">
       <div className="mx-auto px-4 py-10 flex flex-col items-center gap-6">
+        {/* Title + description (always visible) */}
+        <header className="text-center max-w-2xl">
+          <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
+          <p className="mt-3 text-sm md:text-base text-neutral-700">
+            <span className="italic">[word-dia-gram]</span> means “news through
+            writing”, or “word drawing”.
+            <span className="block mt-1">
+              <span className="italic">[word]</span> comes from Old English,
+              meaning “news”.
+              <span className="italic"> [dia]</span> comes from Latin, meaning
+              “through”.
+              <span className="italic"> [gram]</span>, from Greek{" "}
+              <span className="italic">“graphein”</span>, means “to write”.
+              <span className="italic"> [diagram]</span> today means “simplified
+              drawing”.
+            </span>
+            <span className="block mt-1">
+              This is appropriate, because Wordiagram uses AI to translate the
+              latest news headlines into writing, and then into a painting.
+            </span>
+          </p>
+        </header>
+
+        {/* Painting frame */}
         <Frame>
           {painting?.image_url ? (
-            <Image 
+            <Image
               src={imgUrl}
               alt="World-News Painting"
               fill
@@ -39,16 +80,20 @@ export default async function Home() {
             </div>
           )}
         </Frame>
+
+        {/* Date/time and below that: View Archive • Reveal News */}
         {stamp ? (
-          <p className="text-sm text-neutral-700">
-            {stamp} •{" "}
-            <Link
-              href="/archive"
-              className="underline underline-offset-2 decoration-current hover:opacity-80"
-            >
-              View Archive
-            </Link>
-          </p>
+          <>
+            <p className="text-sm text-neutral-700 text-center">{stamp}</p>
+            <NewsReveal clusters={clusterLines}>
+              <Link
+                href="/archive"
+                className="underline underline-offset-2 decoration-current hover:opacity-80"
+              >
+                View Archive
+              </Link>
+            </NewsReveal>
+          </>
         ) : null}
       </div>
     </main>
