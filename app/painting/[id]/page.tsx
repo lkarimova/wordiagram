@@ -57,49 +57,52 @@ export default async function PaintingById({ params }: Props) {
         .filter((t: string) => t.length > 0)
     : [];
 
-  return (
-    <main className="min-h-screen bg-white text-black">
-      <div className="max-w-3xl mx-auto px-4 py-10">
-        <div className="mb-4 flex items-center justify-between">
-          <Link href="/archive" className="text-sm underline">
-            ← Back to Archive
-          </Link>
-          <Link href="/" className="text-sm underline">
-            Back to today
-          </Link>
-        </div>
-
-        <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
-          {src ? (
-            <Image
-              src={bust}
-              alt={`Painting ${painting.date}`}
-              fill
-              style={{ objectFit: "cover" }}
-              priority
-            />
-          ) : (
-            <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
-              No image
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4 space-y-1 text-center">
-          {formattedDate && (
-            <p className="text-base font-medium">{formattedDate}</p>
-          )}
-          {timestamp && (
-            <p className="text-sm text-neutral-600">{timestamp}</p>
-          )}
-        </div>
-
-        {clusterLines.length > 0 && (
-          <div className="mt-4 flex justify-center">
-            <NewsReveal clusters={clusterLines} />
+    return (
+      <main className="min-h-screen bg-white text-black">
+        <div className="max-w-3xl mx-auto px-4 py-10">
+          <div className="mb-4 flex items-center justify-between">
+            <Link href="/archive" className="text-sm underline">
+              ← Back to Archive
+            </Link>
+            <Link href="/" className="text-sm underline">
+              Back to today
+            </Link>
           </div>
-        )}
-      </div>
-    </main>
-  );
-}
+    
+          <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
+            {src ? (
+              <Image
+                src={bust}
+                alt={`Painting ${painting.date}`}
+                fill
+                style={{ objectFit: "cover" }}
+                priority
+              />
+            ) : (
+              <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
+                No image
+              </div>
+            )}
+          </div>
+    
+          <div className="mt-4 space-y-1 text-center">
+            {formattedDate && (
+              <p className="text-base font-medium">{formattedDate}</p>
+            )}
+            {timestamp && (
+              <p className="text-sm text-neutral-600">{timestamp}</p>
+            )}
+          </div>
+    
+          <div className="mt-4 flex justify-center">
+            {clusterLines.length > 0 ? (
+              <NewsReveal clusters={clusterLines} />
+            ) : (
+              <p className="text-xs text-neutral-400 text-center">
+                News details not available for this image.
+              </p>
+            )}
+          </div>
+        </div>
+      </main>
+    );

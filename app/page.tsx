@@ -26,16 +26,18 @@ export default async function Home() {
     : "";
 
   // Build cluster lines from world_theme_summary, stripping "(N sources)"
+  const rawSummary = painting?.world_theme_summary;
   const clusterLines =
-    painting?.world_theme_summary
-      ?.split(" • ")
-      .map((part) =>
-        part
-          // remove trailing "(...)" if present
-          .replace(/\s*\([^)]*\)\s*$/, "")
-          .trim()
-      )
-      .filter(Boolean) ?? [];
+  typeof rawSummary === "string" && rawSummary.trim().length > 0
+    ? rawSummary
+        .split(" • ")
+        .map((part) =>
+          part
+            .replace(/\s*\([^)]*\)\s*$/, "") // strip "(N sources)"
+            .trim()
+        )
+        .filter(Boolean)
+    : [];
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -73,7 +75,8 @@ export default async function Home() {
         {/* Date/time and below that: View Archive • Reveal News */}
         {stamp ? (
           <>
-            <p className="text-sm text-neutral-700 text-center">{stamp}</p>
+          <p className="text-sm text-neutral-700 text-center">{stamp}</p>
+          {clusterLines.length > 0 ? (
             <NewsReveal clusters={clusterLines}>
               <Link
                 href="/archive"
@@ -82,6 +85,11 @@ export default async function Home() {
                 View Archive
               </Link>
             </NewsReveal>
+          ) : (
+            <p className="text-xs text-neutral-400 text-center">
+              News details not available for this image.
+            </p>
+          )}
           </>
         ) : null}
       </div>
