@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 import Link from 'next/link';
 import Image from 'next/image';
-import { listArchive } from "@/src/server/supabase";
+import { listArchive, getLatestPainting } from "@/src/server/supabase";
 import { formatInTimeZone } from "date-fns-tz";
 
 const TZ = "America/New_York";
@@ -11,10 +11,14 @@ export default async function ArchivePage() {
   const items = await listArchive(365);
   const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
 
-  const pastOnly = items.filter(i => i.date !== today);
+  // Get the current homepage image to exclude it
+  const latestPainting = await getLatestPainting();
+  const latestId = latestPainting?.id;
 
-  // Only show dates on/after cutoff
-  const archiveItems = pastOnly.filter(i => i.date >= CUTOFF_DATE);
+  // Filter: show images >= cutoff date, but exclude the current homepage image
+  const archiveItems = items.filter(i => 
+    i.date >= CUTOFF_DATE && i.id !== latestId
+  );
 
   return (
     <main className="min-h-screen bg-white text-black">
