@@ -46,17 +46,11 @@ export default async function Home() {
           <p className="mt-3 text-sm md:text-base text-neutral-700">
               A real-time painting of the latest world news.
               <br />
-              <span className="italic">Wordiagram</span> signifies “news through
-              writing” and “word drawing”.
-              <br />
-              <span className="italic">{"{"}word{"}"}</span>{" "} comes from Old English,
-              meaning “news”.
-              <span className="italic">{"{"}dia{"}"}</span>{" "} comes from Latin, meaning
-              “through”.
-              <span className="italic">{"{"}gram{"}"}</span>{" "} comes from Greek
-              <span className="italic">Graphein</span>, meaning “to write”.
-              <span className="italic">Diagram</span> means “simplified
-              drawing”.
+              <span className="italic">Word</span> comes from Old English,
+              meaning “news”, and
+              <span className="italic">Diagram</span> comes from Latin
+              <span className="italic"> {"{"}dia{"}"}</span>{" "} and
+              <span className="italic"> {"{"}graphein{"}"}</span>{" "}, meaning "through drawing".
           </p>
         </header>
 

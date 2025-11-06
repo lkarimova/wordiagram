@@ -92,7 +92,7 @@ export const config = (() => {
         minItems: 7,        // At least 7 items in cluster
         minSources: 5,      // From at least 5 different sources
         recencyBoost: 0.95, // OR very recent with 7+ items
-        minBreakingClusters: 3, // NEW: require at least 3 breaking clusters overall
+        minBreakingClusters: 5, // NEW: require at least 5 breaking clusters overall
       },
     },
 

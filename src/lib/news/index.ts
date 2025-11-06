@@ -139,6 +139,44 @@ function extractEventPhrase(headline: string): string {
   return words.join(" ");
 }
 
+// ---------- Earthquake helpers ----------
+
+// Extract magnitude from titles like "M 1.3 - 6 km ESE of Valle Vista, CA"
+function extractQuakeMagnitude(title: string): number | null {
+  const t = (title || "").trim();
+  // Match things like "M 1.3", "M2.6", "M 4.8"
+  const match = t.match(/\bM\s*([0-9]+(?:\.[0-9]+)?)/i);
+  if (!match) return null;
+  const mag = parseFloat(match[1]);
+  return Number.isFinite(mag) ? mag : null;
+}
+
+/**
+ * Normalize a cluster title:
+ * - If most member titles look like earthquake magnitudes, rename to "Earthquake M#.##"
+ * - Otherwise, return the raw title (already processed by extractEventPhrase).
+ */
+function normalizeClusterTitle(rawTitle: string, memberTitles: string[]): string {
+  const titles = memberTitles.map(t => (t || "").trim()).filter(Boolean);
+  if (!titles.length) return (rawTitle || "misc").trim();
+
+  const quakeMagnitudes: number[] = [];
+  for (const t of titles) {
+    const mag = extractQuakeMagnitude(t);
+    if (mag !== null) quakeMagnitudes.push(mag);
+  }
+
+  // If the majority of titles are quake-style, treat this as an earthquake cluster
+  if (quakeMagnitudes.length > 0 && quakeMagnitudes.length >= titles.length * 0.6) {
+    const maxMag = Math.max(...quakeMagnitudes);
+    const magStr = maxMag.toFixed(1).replace(/\.0$/, ""); // 5.0 -> "5", 5.3 -> "5.3"
+    return `Earthquake M ${magStr}`;
+  }
+
+  // Default: keep the event phrase / raw title
+  return (rawTitle || "misc").trim();
+}
+
 // ---------- RSS fetch ----------
 async function fetchRss(url: string): Promise<NewsItem[]> {
   try {
@@ -206,6 +244,7 @@ export async function fetchWorldNews(): Promise<NewsItem[]> {
 /**
  * Purely semantic clustering based on embeddings + cosine similarity.
  * Greedy algorithm:
+ *  - Filter out very small earthquakes (M < 5.5)
  *  - Compute embedding per headline
  *  - For each item, assign to the most similar existing cluster if similarity >= threshold
  *  - Otherwise, start a new cluster
@@ -213,27 +252,45 @@ export async function fetchWorldNews(): Promise<NewsItem[]> {
 export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   if (!items.length) return [];
 
-  console.log(`[clustering] Processing ${items.length} items`);
+  // Filter out small earthquakes (e.g. M < 5.5)
+  const filteredItems = items.filter(i => {
+    const mag = extractQuakeMagnitude(i.title || "");
+    if (mag !== null && mag < 5.5) {
+      return false; // ignore small quakes entirely
+    }
+    return true;
+  });
+
+  if (!filteredItems.length) {
+    console.log("[clustering] All items filtered out (likely only small quakes); returning empty clusters");
+    return [];
+  }
+
+  console.log(
+    `[clustering] Processing ${filteredItems.length} items (filtered from ${items.length} total)`
+  );
 
   // Step 1: Embeddings
-  const titles = items.map(i => i.title);
+  const titles = filteredItems.map(i => i.title);
   const embeddings = await getEmbeddings(titles);
 
-  if (!embeddings || embeddings.length !== items.length) {
+  if (!embeddings || embeddings.length !== filteredItems.length) {
     // Fallback path: embeddings failed (including safety rejection)
-    console.warn('[clustering] Embeddings unavailable or mismatched; returning single misc cluster');
-    return [{
-      id: 'world:misc',
-      kind: 'world',
-      title: 'misc',
-      items,
-      score: items.length
-    }];
+    console.warn("[clustering] Embeddings unavailable or mismatched; returning single misc cluster");
+    return [
+      {
+        id: "world:misc",
+        kind: "world",
+        title: "misc",
+        items: filteredItems,
+        score: filteredItems.length,
+      },
+    ];
   }
 
   type NewsItemWithEmbedding = NewsItem & { embedding: number[] };
 
-  const itemsWithEmbeddings: NewsItemWithEmbedding[] = items.map((item, idx) => ({
+  const itemsWithEmbeddings: NewsItemWithEmbedding[] = filteredItems.map((item, idx) => ({
     ...item,
     embedding: embeddings[idx],
   }));
@@ -292,8 +349,9 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
     .filter(c => c.items.length > 0)
     .map((c, idx) => {
       const members = c.items;
-      const uniqueSources = new Set(members.map(m => m.source || ''));
-      const recAvg = members.reduce((s, m) => s + recencyScore(m.publishedAt), 0) / members.length;
+      const uniqueSources = new Set(members.map(m => m.source || ""));
+      const recAvg =
+        members.reduce((s, m) => s + recencyScore(m.publishedAt), 0) / members.length;
       const score = members.length * 2 + uniqueSources.size * 1.5 + recAvg;
 
       // Pick representative title: item whose embedding is closest to cluster centroid
@@ -307,53 +365,33 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
         }
       }
 
+      // First extract the "event phrase" from the representative title...
+      const eventPhrase = extractEventPhrase(repTitle);
+      // ...then normalize for earthquakes (Earthquake M#.##) if applicable
+      const memberTitles = members.map(m => m.title || "");
+      const title = normalizeClusterTitle(eventPhrase, memberTitles);
+
       return {
         id: `world:${idx}`,
-        kind: 'world',
-        title: extractEventPhrase(repTitle),
+        kind: "world",
+        title,
         items: members,
         score,
       } as Cluster;
     });
 
-    const sorted = clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
-    console.log(
-      `[clustering] Created ${sorted.length} semantic clusters, top 3:`,
-      sorted
-        .slice(0, 3)
-        .map(c => `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`)
-    );
-  
-    return sorted;
-  }
+  const sorted = clusters.sort((a, b) => (b.score || 0) - (a.score || 0));
+  console.log(
+    `[clustering] Created ${sorted.length} semantic clusters, top 3:`,
+    sorted
+      .slice(0, 3)
+      .map(
+        c =>
+          `"${c.title}" (${c.items.length} items, score: ${c.score?.toFixed(1)})`
+      )
+  );
 
-/** Decide which clusters are "breaking" by coverage/recency. */
-export function detectBreaking(clusters: Cluster[]): BreakingDecision[] {
-  const out: BreakingDecision[] = [];
-  const { minItems, minSources, recencyBoost } = config.breakingRules.world;
-  
-  for (const c of clusters) {
-    const sources = new Set(c.items.map(i => i.source || ''));
-    const maxRecency = Math.max(...c.items.map(i => recencyScore(i.publishedAt)));
-    
-    const isBreaking = 
-      (c.items.length >= minItems && sources.size >= minSources) || 
-      (maxRecency >= recencyBoost && c.items.length >= 2);
-    
-    if (isBreaking) {
-      console.log(
-        `[breaking] Detected: "${c.title}" - ${c.items.length} items from ${sources.size} sources (recency: ${maxRecency.toFixed(2)})`
-      );
-      out.push({
-        kind: 'world',
-        clusterId: c.id,
-        rationale: `size=${c.items.length}, sources=${sources.size}, recentBoost=${maxRecency.toFixed(2)}`,
-        sources: c.items.slice(0, 5).map(i => i.url)
-      });
-    }
-  }
-  
-  return out;
+  return sorted;
 }
 
 /** 
