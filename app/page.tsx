@@ -99,7 +99,7 @@ export default async function Home() {
           </Link>
           {" "} &rarr;
         </p>
-        <p>© {new Date().getFullYear()} Liza Karimova</p>
+        <p className="mt-4">© {new Date().getFullYear()} Liza Karimova</p>
        </div>
       </footer>
     </main>

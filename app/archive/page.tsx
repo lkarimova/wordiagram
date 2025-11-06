@@ -3,11 +3,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { listArchive } from "@/src/server/supabase";
 import { formatInTimeZone } from "date-fns-tz";
+
 const TZ = "America/New_York";
+const CUTOFF_DATE = "2025-11-06";
 
 export default async function ArchivePage() {
-  const items = await listArchive(90);
+  const items = await listArchive(365);
   const today = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
+
+  const pastOnly = items.filter(i => i.date !== today);
+
+  // Only show dates on/after cutoff
+  const archiveItems = pastOnly.filter(i => i.date >= CUTOFF_DATE);
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -20,7 +27,7 @@ export default async function ArchivePage() {
           <p className="text-sm text-neutral-600">No entries yet.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {items.map((p) => {
+            {archiveItems.map((p) => {
               const src = p.image_url;
               const bust = `${src}${src.includes("?") ? "&" : "?"}v=${encodeURIComponent(p.id)}`;
 
@@ -30,7 +37,7 @@ export default async function ArchivePage() {
                 : p.date;
 
               return (
-                <Link key={p.id} href={`/painting/${p.date}`} className="block">
+                <Link key={p.id} href={`/painting/${p.id}`} className="block">
                   <div className="relative w-full" style={{ aspectRatio: "2 / 3" }}>
                     <Image
                       src={bust}
