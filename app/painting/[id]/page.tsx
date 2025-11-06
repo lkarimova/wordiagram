@@ -8,7 +8,7 @@ import { NewsReveal } from "@/src/components/NewsReveal";
 
 const TZ = "America/New_York";
 
-type Props = { params: { id: string } };
+type Props = { params: Promise<{ id: string }> };
 
 export default async function PaintingById({ params }: Props) {
   const { id } = params;
