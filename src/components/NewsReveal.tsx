@@ -27,8 +27,9 @@ export function NewsReveal({ clusters, children }: NewsRevealProps) {
           >
             {open ? "Hide News" : "Reveal News"}
           </button>
-        )}
-      </div>
+        </>
+      )}
+    </div>
 
       {/* Cluster lines, shown only when open */}
       {open && hasClusters && (
