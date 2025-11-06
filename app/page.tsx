@@ -46,12 +46,9 @@ export default async function Home() {
           <p className="mt-3 text-sm text-neutral-700">
               A real-time painting of the latest world news.
               <br />
-              <span className="italic">Word</span> comes from Old English,
-              meaning “news”.
+              <span className="italic">Word</span> comes from Old English, meaning “news”.
               <br />
-              <span className="italic"> Diagram</span> comes from Latin
-              <span className="italic"> {"{"}dia{"}"}</span>{" "} and
-              <span className="italic"> {"{"}graphein{"}"}</span>, meaning "through drawing".
+              <span className="italic"> Diagram</span> comes from Latin, meaning "through drawing".
           </p>
         </header>
 
@@ -92,12 +89,13 @@ export default async function Home() {
       <footer className="mt-10 mb-10 text-xs text-neutral-500">
        <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
         <p className="mt-1">
-          Created with GitHub, Vercel, Cursor, Supabase, and OpenAI (gpt-image-1).
+          Created with OpenAI's GPT-image-1, GitHub, Vercel, Supabase, Cursor, Claude AI, ChatGPT.{" "}
+          <br />
           <Link
             href="/process"
             className="underline underline-offset-2 hover:opacity-80"
           >
-          {" "} My Process
+          Read about my process
           </Link>
           {" "} &rarr;
         </p>
