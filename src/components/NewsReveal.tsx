@@ -35,7 +35,7 @@ export function NewsReveal({ clusters, children }: NewsRevealProps) {
       {open && hasClusters && (
         <div className="mt-2 text-neutral-500 italic">
           {clusters.map((line, idx) => (
-            <p key={i}>"{line}"</p>
+            <p key={idx}>"{line}"</p>
           ))}
         </div>
       )}
