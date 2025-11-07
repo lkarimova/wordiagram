@@ -40,15 +40,8 @@ export default async function Home() {
     : [];
 
   return (
-    <main className="min-h-screen bg-white text-black"
-      style={{
-      backgroundImage: 'url(living_room.jpg)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'scroll'
-    }}
-    >
-      <div className="mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
+      <main className="min-h-screen">
+      <div className="mx-auto px-6 py-10 pb-4 flex flex-col items-center gap-6">
         {/* Title + description (always visible) */}
         <header className="text-center max-w-2xl mb-6">
           <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
