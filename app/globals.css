@@ -60,3 +60,8 @@ body.body-plain {
   background-image: none;
   background-color: var(--background);
 }
+
+.diff-text {
+  mix-blend-mode: difference;
+  color: white; /* base color; difference will invert relative to background */
+}
