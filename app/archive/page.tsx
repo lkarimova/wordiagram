@@ -56,7 +56,7 @@ export default async function ArchivePage() {
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-neutral-700">{label}</p>
+                  <p className="mt-2 text-sm text-neutral-700 text-center">{label}</p>
                 </Link>
               );
             })}
