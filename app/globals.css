@@ -27,15 +27,22 @@ body {
 }
 
 /* Homepage background */
+/* Default: mobile-first */
 body.body-home {
   background-image: 
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
   background-size: cover;
-  background-position: top center;
+  background-position: center center;
   background-attachment: scroll; /* or fixed if you like */
 }
-
+/* Desktop-only tweaks */
+@media (min-width: 768px) {
+  body.body-home {
+    background-attachment: fixed;
+    background-position: center 30%; /* crop top 20-ish% on larger screens */
+  }
+}
 /* Archive page background */
 body.body-archive {
   background-image:
