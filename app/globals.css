@@ -32,7 +32,7 @@ body.body-home {
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
   background-size: cover;
-  background-position: center;
+  background-position: top center;
   background-attachment: scroll; /* or fixed if you like */
 }
 

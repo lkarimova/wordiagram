@@ -29,13 +29,13 @@ export function NewsReveal({ clusters, children }: NewsRevealProps) {
           </button>
         </>
       )}
-    </div>
+      </div>
 
       {/* Cluster lines, shown only when open */}
       {open && hasClusters && (
         <div className="mt-2 text-neutral-500 italic">
           {clusters.map((line, idx) => (
-            <p key={idx}>{line}</p>
+            <p key={i}>"{line}"</p>
           ))}
         </div>
       )}

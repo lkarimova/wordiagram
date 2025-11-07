@@ -21,7 +21,7 @@ export default async function ArchivePage() {
   );
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen text-black">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-medium">Archive</h1>
@@ -31,7 +31,7 @@ export default async function ArchivePage() {
         <p className="text-sm text-neutral-600 mb-6">
           For Archive entries prior to November 6, 2025, please visit the <Link href="/process" className="underline">My Process</Link> page.
         </p>
-        
+
         {archiveItems.length === 0 ? (
           <p className="text-sm text-neutral-600">No Archive entries yet.</p>
         ) : (
