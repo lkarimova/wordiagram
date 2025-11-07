@@ -23,7 +23,7 @@ export default async function ProcessPage() {
           </Link>
         </div>
 
-        <p className="text-sm text-neutral-400 mb-4 leading-relaxed">
+        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
           11/06/2025
           <br />{" "}
           <br />
@@ -31,8 +31,7 @@ export default async function ProcessPage() {
           never coded before, this was a fun and challenging first project. I
           learned what API&apos;s, GitHub, Vercel, Supabase were, and how to use
           Cursor, Claude and Chat GPT to build a project that uses backend to
-          <span className="font-bold text-black"> pull in live data, process it through prompt engineering, and render
-          images representing meaning.</span> Please feel free to{" "}
+          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and render<span className="font-bold text-black"> images representing meaning.</span> Please feel free to{" "}
           <a
             href="mailto:lkarimova.design@gmail.com"
             className="font-bold text-black underline underline-offset-2 hover:text-neutral-600"
@@ -42,7 +41,7 @@ export default async function ProcessPage() {
           me with questions and feedback. I hope you enjoy this project!
         </p>
 
-        <p className="text-sm text-neutral-400 mb-4 leading-relaxed">
+        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
           <span className="font-medium text-xl text-black">Challenges</span>
           <br />
           Most of the work focused on backend challenges: making the prompt
@@ -68,28 +67,30 @@ export default async function ProcessPage() {
           2.Creating a Dynamic Generation Logic for Breaking News:
           </span>{" "}
           Designing a stable pipeline that generated an image only when meaningful
-          changes occurred was challenging. I had to define what qualified as breaking news. It included <span className="font-bold">creating thresholds
-          for news recency, news cluster change, and number of news sources so the system reacted to real global shifts</span> while not over-generating images.
+          changes occurred was challenging. I had to define what qualified as breaking news. It included <span className="font-bold text-black">creating thresholds
+          for news recency, news cluster change, and number of news sources</span> so the system reacted to real global shifts while not over-generating images.
           <br />{" "}
           <br />
           <span className="font-bold text-black">
           3. Prompt Composition, Safety &amp; Data Interpretation:
           </span>{" "}
           Linking world news clusters semantically to symbolic visual motifs demanded
-          experimentation. I started with <span className="font-bold text-black">keyword-based clustering, but it felt too vague and generic</span>.
-          I then tried <span className="font-bold text-black">embedding-based clustering (using text-embedding-3-small) which introduced complexity, but gave much richer results</span>. This semantic version managed to capture relationships between
-          global headlines more meaningfully. I had to <span className="font-bold text-black">handle OpenAI safety rejections
-          by sanitizing harsh language and abstracting violent or sensitive terms</span>. I also created <span className="font-bold text-black">fallback heuristics for edge cases through post-processing</span>, such as breaking earthquake news showing up as magnitude numbers "M 5.0" without descriptors.
+          experimentation. I started with <span className="font-bold text-black">keyword-based clustering,</span> but it felt too vague and generic.
+          I then tried <span className="font-bold text-black">embedding-based clustering (using text-embedding-3-small)</span> which introduced complexity, but gave much richer results. This semantic version managed to capture relationships between
+          global headlines more meaningfully. I had to handle<span className="font-bold text-black"> OpenAI safety rejections</span>
+          by sanitizing harsh language and abstracting violent or sensitive terms. I also created <span className="font-bold text-black">fallback heuristics for edge cases</span> through post-processing, such as breaking earthquake news showing up as magnitude numbers "M 5.0" without descriptors.
         </p>
 
-        <p className="text-sm text-neutral-400 mb-4 leading-relaxed">
+        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
           <span className="font-medium text-xl text-black">Learnings</span>
           <br />{" "}
           <br />
           <span className="font-bold text-black">1. Creativity lies in constraint.</span> Randomness is not encouraged, so decision logic becomes extremely
           important.
+          <br />
           <span className="font-bold text-black">2. Precision in logic design is what enables open-ended expression.</span> It&apos;s hard to make AI not take things literally, but certain
           things need to be defined.
+          <br />
           <span className="font-bold text-black">3. GPT-Image-1 has some distinct limitations:</span>
           <span className="block indent-8">
           - It cannot do additive masked image edits without regenerating the
@@ -105,15 +106,15 @@ export default async function ProcessPage() {
           </span>
           </p>
 
-          <p className="text-sm text-neutral-400 mb-4 leading-relaxed">
-          I originally started off with asking GPT-Image-1 to determine the
+          <p className="text-sm font-italic text-neutral-500 mb-4 leading-relaxed">
+          (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
           news. Through trial and error, I learned that those things were not
-          possible, and that my design had to be simplified.
+          possible, and that my design had to be simplified.)
         </p>
 
-        <p className="text-sm text-neutral-400 mb-4 leading-relaxed">
+        <p className="text-sm text-neutral-500 mb-4 leading-relaxed">
           Paintings from older prompt iterations are displayed below.
         </p>
 
