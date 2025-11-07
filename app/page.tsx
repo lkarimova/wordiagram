@@ -40,7 +40,14 @@ export default async function Home() {
     : [];
 
   return (
-    <main className="min-h-screen bg-white text-black">
+    <main className="min-h-screen bg-white text-black"
+      style={{
+      backgroundImage: 'url(public/living_room.jpg)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}
+    >
       <div className="mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
         {/* Title + description (always visible) */}
         <header className="text-center max-w-2xl mb-6">

@@ -53,7 +53,7 @@ export default async function ProcessPage() {
           to design a clear decision logic.
           <br />{" "}
           <br />
-          <span className="font-bold text-black">
+          <span className="font-bold text-italic text-black">
           1. Balancing Autonomy vs. Control in Image Generation:
           </span>{" "}
           Getting GPT-Image-1 to produce consistent yet symbolic paintings was
@@ -63,7 +63,7 @@ export default async function ProcessPage() {
           find the right balance between freedom and compositional discipline.
           <br />{" "}
           <br />
-          <span className="font-bold text-black">
+          <span className="font-bold text-italic text-black">
           2.Creating a Dynamic Generation Logic for Breaking News:
           </span>{" "}
           Designing a stable pipeline that generated an image only when meaningful
@@ -71,7 +71,7 @@ export default async function ProcessPage() {
           for recency, cluster change, and number of news sources</span> so the system reacted to real global shifts while not over-generating images.
           <br />{" "}
           <br />
-          <span className="font-bold text-black">
+          <span className="font-bold text-italic text-black">
           3. Prompt Composition, Safety &amp; Data Interpretation:
           </span>{" "}
           Linking world news clusters semantically to symbolic visual motifs demanded
@@ -97,7 +97,7 @@ export default async function ProcessPage() {
           logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
           </p>
 
-          <p className="text-sm text-italic-500 mb-4 leading-relaxed">
+          <p className="text-sm text-italic-400 mb-4 leading-relaxed">
           (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
