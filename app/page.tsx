@@ -77,6 +77,8 @@ export default async function Home() {
           <>
           <p className="text-sm text-neutral-700 text-center">{stamp}</p>
           {clusterLines.length > 0 ? (
+            <div className="w-full flex justify-center">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 py-3 max-w-md text-black">
             <NewsReveal clusters={clusterLines}>
               <Link
                 href="/archive"
@@ -85,6 +87,8 @@ export default async function Home() {
                 View Archive
               </Link>
             </NewsReveal>
+            </div>
+            </div>
           ) : (
             <p className="text-xs text-neutral-400 text-center">
               News details not available for this image.
