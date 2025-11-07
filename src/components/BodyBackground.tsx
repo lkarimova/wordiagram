@@ -1,3 +1,4 @@
+// src/components/BodyBackground.tsx
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -21,12 +22,5 @@ export function BodyBackground({ children }: { children: React.ReactNode }) {
     body.classList.add(cls);
   }, [pathname]);
 
-  const isHome = pathname === "/";
-
-  return (
-    <>
-      {isHome && <div className="site-bg" />} {/* ONLY on home */}
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

@@ -26,21 +26,15 @@ body {
   font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
-/* Fixed, full-screen background used ONLY on homepage */
-.site-bg {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center 30%; /* adjust crop as you like */
-}
-
 /* Homepage background: fixed */
-body.body-home .site-bg {
+body.body-home {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
+  background-size: cover;  
+  background-repeat: no-repeat;
+  background-position: center 30%;
+  background-attachment: scroll;
   background-color: var(--background); /* fallback while loading */
 }
 /* Archive page background */
