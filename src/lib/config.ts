@@ -92,12 +92,12 @@ export const config = (() => {
         minItems: 7,        // At least 7 items in cluster
         minSources: 5,      // From at least 5 different sources
         recencyBoost: 0.95, // OR very recent with 7+ items
-        minBreakingClusters: 4, // NEW: require at least 4 breaking clusters overall
+        minBreakingClusters: 3, // NEW: require at least 3 breaking clusters overall
       },
     },
 
     // Headline change threshold
-    headlineChangeThreshold: 0.75, // 75% change triggers clustering check
+    headlineChangeThreshold: 0.50, // 50% change triggers clustering check
 
     storage: {
       publicPrefix: "world-news-painting",
