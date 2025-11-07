@@ -31,7 +31,7 @@ export default async function ProcessPage() {
           <br />
           Most of the work focused on backend challenges: making the prompt safe, building a logic that interprets headlines as symbols rather than literal text, and experimenting with clustering and update cadence to balance coherence with variation. Getting the AI engine to think metaphorically instead of descriptively was surprisingly difficult, since randomness is discouraged in most models, and I had to design a clear decision logic.
           <br />
-          [" "]
+          {" "}
           <br />
           1. <span className="font-bold">Balancing Autonomy vs. Control in Image Generation:
              </span> Getting GPT-Image-1 to produce consistent yet symbolic paintings was difficult, because it tended to either over-abstract (losing meaning) or over-literalize (turning into illustrations). 
