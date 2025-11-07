@@ -32,14 +32,14 @@ body.body-home {
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
   background-size: cover;
-  background-position: top center;
+  background-position: center 20%;
   background-attachment: scroll; /* or fixed if you like */
 }
 
 /* Archive page background */
 body.body-archive {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),
     url("/archive_room.jpg");
   background-size: cover;
   background-position: center;
