@@ -95,13 +95,17 @@ export default async function PaintingById({ params }: Props) {
           </div>
     
           <div className="mt-4 flex justify-center">
-            {clusterLines.length > 0 ? (
-              <NewsReveal clusters={clusterLines} />
-            ) : (
-              <p className="text-xs text-neutral-400 text-center">
-                News details not available for this image.
-              </p>
-            )}
+          {clusterLines.length > 0 ? (
+            <div className="text-sm text-neutral-500 italic text-center space-y-1">
+             {clusterLines.map((line, idx) => (
+              <p key={idx}>“{line}”</p>
+             ))}
+            </div>
+          ) : (
+            <p className="text-xs text-neutral-400 text-center">
+         News details not available for this image.
+            </p>
+          )}
           </div>
         </div>
       </main>
