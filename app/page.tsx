@@ -42,7 +42,7 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-white text-black"
       style={{
-      backgroundImage: 'url(public/living_room.jpg)',
+      backgroundImage: 'url(living_room.jpg)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed'

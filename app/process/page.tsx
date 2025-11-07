@@ -31,7 +31,7 @@ export default async function ProcessPage() {
           never coded before, this was a fun and challenging first project. I
           learned what API&apos;s, GitHub, Vercel, Supabase were, and how to use
           Cursor, Claude and Chat GPT to build a project that uses backend to
-          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and <span className="font-bold text-black">render images representing meaning.</span> Please feel free to{" "}
+          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and <span className="font-bold text-black">render meaningfulimages.</span> Please feel free to{" "}
           <a
             href="mailto:lkarimova.design@gmail.com"
             className="font-bold text-black underline underline-offset-2 hover:text-neutral-600"
@@ -53,7 +53,7 @@ export default async function ProcessPage() {
           to design a clear decision logic.
           <br />{" "}
           <br />
-          <span className="font-bold text-italic text-black">
+          <span className="font-bold italic text-black">
           1. Balancing Autonomy vs. Control in Image Generation:
           </span>{" "}
           Getting GPT-Image-1 to produce consistent yet symbolic paintings was
@@ -63,7 +63,7 @@ export default async function ProcessPage() {
           find the right balance between freedom and compositional discipline.
           <br />{" "}
           <br />
-          <span className="font-bold text-italic text-black">
+          <span className="font-bold italic text-black">
           2.Creating a Dynamic Generation Logic for Breaking News:
           </span>{" "}
           Designing a stable pipeline that generated an image only when meaningful
@@ -71,7 +71,7 @@ export default async function ProcessPage() {
           for recency, cluster change, and number of news sources</span> so the system reacted to real global shifts while not over-generating images.
           <br />{" "}
           <br />
-          <span className="font-bold text-italic text-black">
+          <span className="font-bold italic text-black">
           3. Prompt Composition, Safety &amp; Data Interpretation:
           </span>{" "}
           Linking world news clusters semantically to symbolic visual motifs demanded
@@ -91,7 +91,7 @@ export default async function ProcessPage() {
           <span className="font-bold text-black">2. Precision in logic design is what enables open-ended expression.</span> It&apos;s hard to make AI not take things literally, but certain
           things need to be defined.
           <br />
-          <span className="font-bold text-black">3. GPT-Image-1 has some distinct limitations:</span>
+          <span className="font-bold text-black">3. GPT-Image-1 has some distinct limitations: </span>
           (a) It cannot do <span className="font-bold text-black">additive masked image edits</span> without regenerating the
           entire image, (b) it cannot <span className="font-bold text-black">derive artistic style</span> from words without interpretation
           logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
