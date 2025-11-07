@@ -31,7 +31,7 @@ export default async function ProcessPage() {
           never coded before, this was a fun and challenging first project. I
           learned what API&apos;s, GitHub, Vercel, Supabase were, and how to use
           Cursor, Claude and Chat GPT to build a project that uses backend to
-          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and render<span className="font-bold text-black"> images representing meaning.</span> Please feel free to{" "}
+          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and <span className="font-bold text-black">render images representing meaning.</span> Please feel free to{" "}
           <a
             href="mailto:lkarimova.design@gmail.com"
             className="font-bold text-black underline underline-offset-2 hover:text-neutral-600"
@@ -47,7 +47,7 @@ export default async function ProcessPage() {
           Most of the work focused on backend challenges: making the prompt
           safe, building a logic that interprets headlines as symbols rather
           than literal text, and experimenting with clustering and update
-          cadence to balance coherence with variation. Getting the AI engine to
+          cadence to <span className="font-bold text-black">balance coherence with variation.</span> Getting the AI engine to
           think metaphorically instead of descriptively was surprisingly
           difficult, since <span className="font-bold text-black">randomness is discouraged in most models</span>, and I had
           to design a clear decision logic.
@@ -59,7 +59,7 @@ export default async function ProcessPage() {
           Getting GPT-Image-1 to produce consistent yet symbolic paintings was
           difficult, because it tended to either over-abstract
           or over-literalize. I spent a lot of
-          effort <span className="font-bold text-black">tuning prompts, negative prompts, and structural “locks”</span> to
+          effort <span className="font-bold text-black">fine-tuning prompts, negative prompts, and structural “locks”</span> to
           find the right balance between freedom and compositional discipline.
           <br />{" "}
           <br />
@@ -68,7 +68,7 @@ export default async function ProcessPage() {
           </span>{" "}
           Designing a stable pipeline that generated an image only when meaningful
           changes occurred was challenging. I had to define what qualified as breaking news. It included <span className="font-bold text-black">creating thresholds
-          for news recency, news cluster change, and number of news sources</span> so the system reacted to real global shifts while not over-generating images.
+          for recency, cluster change, and number of news sources</span> so the system reacted to real global shifts while not over-generating images.
           <br />{" "}
           <br />
           <span className="font-bold text-black">
@@ -77,7 +77,7 @@ export default async function ProcessPage() {
           Linking world news clusters semantically to symbolic visual motifs demanded
           experimentation. I started with <span className="font-bold text-black">keyword-based clustering,</span> but it felt too vague and generic.
           I then tried <span className="font-bold text-black">embedding-based clustering (using text-embedding-3-small)</span> which introduced complexity, but gave much richer results. This semantic version managed to capture relationships between
-          global headlines more meaningfully. I had to handle<span className="font-bold text-black"> OpenAI safety rejections</span>
+          global headlines more meaningfully. I had to handle<span className="font-bold text-black"> OpenAI safety rejections </span>
           by sanitizing harsh language and abstracting violent or sensitive terms. I also created <span className="font-bold text-black">fallback heuristics for edge cases</span> through post-processing, such as breaking earthquake news showing up as magnitude numbers "M 5.0" without descriptors.
         </p>
 
@@ -92,21 +92,12 @@ export default async function ProcessPage() {
           things need to be defined.
           <br />
           <span className="font-bold text-black">3. GPT-Image-1 has some distinct limitations:</span>
-          <span className="block indent-8">
-          - It cannot do additive masked image edits without regenerating the
-          entire image
-          </span>
-          <span className="block indent-8">
-          - It cannot derive artistic style from words without interpretation
-          logic.
-          </span>
-          <span className="block indent-8">
-          - It cannot apply an artistic style without modifying the content of
-          the image.
-          </span>
+          (a) It cannot do <span className="font-bold text-black">additive masked image edits</span> without regenerating the
+          entire image, (b) it cannot <span className="font-bold text-black">derive artistic style</span> from words without interpretation
+          logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
           </p>
 
-          <p className="text-sm font-italic text-neutral-500 mb-4 leading-relaxed">
+          <p className="text-sm text-italic-500 mb-4 leading-relaxed">
           (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
