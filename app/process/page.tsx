@@ -97,7 +97,7 @@ export default async function ProcessPage() {
           logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
           </p>
 
-          <p className="text-sm text-italic-400 mb-4 leading-relaxed">
+          <p className="text-sm text-400 mb-4 leading-relaxed italic">
           (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
