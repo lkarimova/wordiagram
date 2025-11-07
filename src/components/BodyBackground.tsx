@@ -1,4 +1,3 @@
-// src/components/BodyBackground.tsx
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -26,7 +25,7 @@ export function BodyBackground({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {isHome && <div className="site-bg" />} {/* fixed bg ONLY on home */}
+      {isHome && <div className="site-bg" />} {/* ONLY on home */}
       {children}
     </>
   );
