@@ -27,8 +27,13 @@ export default async function ArchivePage() {
           <h1 className="text-xl font-medium">Archive</h1>
           <Link href="/" className="underline">Back to today</Link>
         </div>
+
+        <p className="text-sm text-neutral-600 mb-6">
+          For Archive entries prior to November 6, 2025, please visit the <Link href="/process" className="underline">My Process</Link> page.
+        </p>
+        
         {archiveItems.length === 0 ? (
-          <p className="text-sm text-neutral-600">No Archive entries yet. For Archive entries prior to November 6, 2025, please visit the <Link href="/process" className="underline">My Process</Link> page.</p>
+          <p className="text-sm text-neutral-600">No Archive entries yet.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {archiveItems.map((p) => {
