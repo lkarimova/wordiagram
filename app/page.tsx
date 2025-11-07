@@ -41,7 +41,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-white text-black">
-      <div className="mx-auto px-4 py-10 flex flex-col items-center gap-6">
+      <div className="mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
         {/* Title + description (always visible) */}
         <header className="text-center max-w-2xl mb-6">
           <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
@@ -94,7 +94,7 @@ export default async function Home() {
         ) : null}
       </div>
 
-      <footer className="mt-10 mb-10 text-xs text-neutral-500">
+      <footer className="mt-4 mb-16 mt:mb-10 text-xs text-neutral-500">
        <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
         <p className="mt-1">
           Created with OpenAI's GPT-image-1, GitHub, Vercel, Supabase, Cursor, Claude AI, ChatGPT.{" "}
