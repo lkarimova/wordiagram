@@ -94,7 +94,7 @@ export default async function Home() {
         ) : null}
       </div>
 
-      <footer className="mt-4 mb-16 mt:mb-10 text-xs text-neutral-500 diff-text">
+      <footer className="mt-4 mb-16 mt:mb-10 text-xs text-neutral-500">
        <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
         <p className="mt-1 text-sm text-neutral-700">
           Created with OpenAI's GPT-image-1, GitHub, Vercel, Supabase, Cursor, Claude AI, ChatGPT.{" "}
