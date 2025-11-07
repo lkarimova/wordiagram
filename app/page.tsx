@@ -78,7 +78,7 @@ export default async function Home() {
           <p className="text-sm text-neutral-700 text-center">{stamp}</p>
           {clusterLines.length > 0 ? (
             <div className="w-full flex justify-center">
-            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-10 max-w-md text-black">
+            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-10 py-4 max-w-md text-black">
             <NewsReveal clusters={clusterLines}>
               <Link
                 href="/archive"
@@ -111,7 +111,7 @@ export default async function Home() {
           </Link>
           {" "} &rarr;
         </p>
-        <p className="mt-4">© {new Date().getFullYear()} Liza Karimova</p>
+        <p className="mt-4 text-neutral-500">© {new Date().getFullYear()} Liza Karimova</p>
        </div>
       </footer>
     </main>
