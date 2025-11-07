@@ -26,22 +26,22 @@ body {
   font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
 
-/* Homepage background */
-/* Default: mobile-first */
-body.body-home {
-  background-image: 
+/* Fixed, full-screen background used ONLY on homepage */
+.site-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center 30%; /* adjust crop as you like */
+}
+
+/* Homepage background: fixed */
+body.body-home .site-bg {
+  background-image:
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
-  background-size: cover;
-  background-position: center center;
-  background-attachment: scroll; /* or fixed if you like */
-}
-/* Desktop-only tweaks */
-@media (min-width: 768px) {
-  body.body-home {
-    background-attachment: fixed;
-    background-position: center 30%; /* crop top 20-ish% on larger screens */
-  }
+  background-color: var(--background); /* fallback while loading */
 }
 /* Archive page background */
 body.body-archive {
@@ -50,7 +50,9 @@ body.body-archive {
     url("/archive_room.jpg");
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  background-color: var(--background); /* fallback */
 }
 
 /* "No image" pages */
