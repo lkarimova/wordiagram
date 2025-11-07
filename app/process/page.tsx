@@ -22,17 +22,25 @@ export default async function ProcessPage() {
 
         <p className="text-sm text-neutral-600 mb-4">
           11/06/2025
+          <br />{" "}
           <br />
           I have been learning how to code for past 3 weeks. As someone that has
           never coded before, this was a fun and challenging first project. I
           learned what API&apos;s, GitHub, Vercel, Supabase were, and how to use
           Cursor, Claude and Chat GPT to build a project that uses backend to
           pull in live data, process it through prompt engineering, and render
-          images representing meaning.
+          images representing meaning. I hope you enjoy this project! Please feel free to{" "}
+          <a
+            href="mailto:lkarimova.design@gmail.com"
+            className="underline hover:text-neutral-600"
+          >
+            contact
+          </a>{" "}
+          me with questions and feedback.
         </p>
 
         <p className="text-sm text-neutral-600 mb-4">
-          <span className="font-bold">Main Challenges:</span>
+          <span className="font-bold">Challenges:</span>
           <br />
           Most of the work focused on backend challenges: making the prompt
           safe, building a logic that interprets headlines as symbols rather
@@ -82,6 +90,7 @@ export default async function ProcessPage() {
           Through this process, I learned how sensitive generative systems are
           to framing, and how much creativity lies in constraint. It taught me
           that precision in logic design is what enables open-ended expression.
+          <br />{" "}
           <br />
           1. It&apos;s hard to make AI not take things literally, but certain
           things need to be defined.
@@ -105,17 +114,6 @@ export default async function ProcessPage() {
           images with masked, additive edits based on breaking World and Art
           news. Through trial and error, I learned that those things were not
           possible, and that my design had to be simplified.
-        </p>
-
-        <p className="text-sm text-neutral-600 mb-4">
-          I hope you enjoy this project! Please feel free to{" "}
-          <a
-            href="mailto:lkarimova.design@gmail.com"
-            className="underline hover:text-neutral-600"
-          >
-            contact
-          </a>{" "}
-          me with questions and feedback.
         </p>
 
         <p className="text-sm text-neutral-600 mb-4">
