@@ -45,7 +45,7 @@ export default async function Home() {
       backgroundImage: 'url(living_room.jpg)',
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
+      backgroundAttachment: 'scroll'
     }}
     >
       <div className="mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
