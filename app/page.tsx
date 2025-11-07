@@ -78,7 +78,7 @@ export default async function Home() {
           <p className="text-sm text-neutral-700 text-center">{stamp}</p>
           {clusterLines.length > 0 ? (
             <div className="w-full flex justify-center">
-            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-10 py-4 max-w-md text-black">
+            <div className="bg-white/15 backdrop-blur-lg rounded-2xl px-10 py-4 max-w-md text-black">
             <NewsReveal clusters={clusterLines}>
               <Link
                 href="/archive"
