@@ -40,7 +40,8 @@ body.body-home {
 /* Archive page background */
 body.body-archive {
   background-image:
-    url("/archive_room_1.jpg");
+  linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3)),  
+  url("/archive_room_1.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
