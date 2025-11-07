@@ -30,7 +30,7 @@ body {
 body.body-home {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
-    url("/living_room.jpg");
+    url("/living_room_1.jpg");
   background-size: cover;  
   background-repeat: no-repeat;
   background-position: center 30%;
