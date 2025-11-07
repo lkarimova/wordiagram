@@ -25,3 +25,29 @@ body {
   color: var(--foreground);
   font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 }
+
+/* Homepage background */
+body.body-home {
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("/living_room.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: scroll; /* or fixed if you like */
+}
+
+/* Archive page background */
+body.body-archive {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("/archive_room.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* "No image" pages */
+body.body-plain {
+  background-image: none;
+  background-color: var(--background);
+}
