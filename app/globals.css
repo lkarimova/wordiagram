@@ -51,6 +51,7 @@ body.body-archive {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-attachment: fixed;
   background-color: var(--background); /* fallback */
 }
 
