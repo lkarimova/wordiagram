@@ -28,12 +28,11 @@ body {
 
 /* Fixed, full-screen background used ONLY on homepage */
 .site-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: -1;
   background-size: cover;
   background-repeat: no-repeat;
-  background-attachment: scroll;
   background-position: center 30%; /* adjust crop as you like */
 }
 
@@ -42,7 +41,6 @@ body.body-home .site-bg {
   background-image:
     linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
     url("/living_room.jpg");
-  background-attachment: scroll;
   background-color: var(--background); /* fallback while loading */
 }
 /* Archive page background */
