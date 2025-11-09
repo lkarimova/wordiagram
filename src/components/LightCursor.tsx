@@ -50,27 +50,47 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-20"
+    className="pointer-events-none absolute inset-0 z-20"
+    style={{
+      opacity: visible ? 1 : 0,
+      transition: "opacity 150ms ease-out",
+    }}
+  >
+    {/* Soft base halo */}
+    <div
       style={{
-        opacity: visible ? 1 : 0,
-        transition: "opacity 150ms ease-out",
+        position: "absolute",
+        width: "280px",
+        height: "280px",
+        left: pos.x,
+        top: pos.y,
+        transform: "translate(-50%, -50%)",
+        borderRadius: "999px",
+        background:
+          "radial-gradient(circle, rgba(255, 240, 210, 0.35) 0%, rgba(255, 240, 210, 0.0) 70%)",
+        filter: "blur(20px)",
+        opacity: 0.9,
+        mixBlendMode: "soft-light",
       }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          width: "240px",
-          height: "240px",
-          left: pos.x,
-          top: pos.y,
-          transform: "translate(-50%, -50%)",
-          borderRadius: "999px",
-          background:
-            "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0) 70%)",
-          filter: "blur(10px)",
-          mixBlendMode: "soft-light",
-        }}
-      />
+    />
+  
+    {/* Tighter highlight */}
+    <div
+      style={{
+        position: "absolute",
+        width: "160px",
+        height: "160px",
+        left: pos.x,
+        top: pos.y,
+        transform: "translate(-50%, -50%)",
+        borderRadius: "999px",
+        background:
+          "radial-gradient(circle, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.0) 60%)",
+        filter: "blur(8px)",
+        opacity: 0.8,
+        mixBlendMode: "screen", // or "overlay" if you prefer
+      }}
+    />
     </div>
   );
 }
