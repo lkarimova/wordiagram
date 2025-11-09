@@ -39,81 +39,101 @@ export default async function Home() {
         .filter(Boolean)
     : [];
 
-  return (
+    return (
       <main className="min-h-screen text-black">
-      <div className="mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
-        {/* Title + description (always visible) */}
-        <header className="text-center max-w-2xl mb-6">
-          <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
-          <p className="mt-3 text-sm text-neutral-700">
-              A real-time painting of the latest world news.
-              <br />
-              <span className="italic">Word</span> comes from Old English, meaning “news”.
-              <br />
-              <span className="italic"> Diagram</span> comes from Latin, meaning "through drawing".
-          </p>
-        </header>
-
-        {/* Painting frame */}
-        <Frame>
-          {painting?.image_url ? (
-            <Image
-              src={imgUrl}
-              alt="World-News Painting"
-              fill
-              style={{ objectFit: "cover" }}
-              sizes="(max-width: 768px) 90vw, 600px"
-              priority
-            />
-          ) : (
-            <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
-              No image yet
+        {/* NEW: root container with background image */}
+        <div
+          id="page-root"
+          className="relative min-h-screen w-full bg-cover bg-center"
+          style={{
+            // put your actual background here
+            // or replace with a Tailwind class if you're using that
+            backgroundImage: "url('/your-background.jpg')",
+          }}
+        >
+          {/* Glow overlay: covers the whole background area */}
+          <LightCursor attachToSelector="#page-root" />
+  
+          {/* Content sits ABOVE the glow (z-30) */}
+          <div className="relative z-30 mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
+            {/* Title + description */}
+            <header className="text-center max-w-2xl mb-6">
+              <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
+              <p className="mt-3 text-sm text-neutral-700">
+                A real-time painting of the latest world news.
+                <br />
+                <span className="italic">Word</span> comes from Old English, meaning “news”.
+                <br />
+                <span className="italic"> Diagram</span> comes from Latin, meaning "through drawing".
+              </p>
+            </header>
+  
+            {/* Painting frame (still under the glow visually, because glow uses blend mode) */}
+            <div className="relative z-10">
+              <Frame>
+                {painting?.image_url ? (
+                  <Image
+                    src={imgUrl}
+                    alt="World-News Painting"
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="(max-width: 768px) 90vw, 600px"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full grid place-items-center text-sm text-neutral-500">
+                    No image yet
+                  </div>
+                )}
+              </Frame>
             </div>
-          )}
-        </Frame>
-
-        {/* Date/time and below that: View Archive • Reveal News */}
-        {stamp ? (
-          <>
-          <p className="text-sm text-neutral-700 text-center">{stamp}</p>
-          {clusterLines.length > 0 ? (
-            <div className="w-full flex justify-center">
-            <div className="bg-white/15 backdrop-blur-lg rounded-2xl px-10 py-4 max-w-md text-black">
-            <NewsReveal clusters={clusterLines}>
-              <Link
-                href="/archive"
-                className="underline underline-offset-2 decoration-current hover:opacity-80"
-              >
-                View Archive
-              </Link>
-            </NewsReveal>
+  
+            {/* Date/time and Reveal News */}
+            {stamp ? (
+              <>
+                <p className="text-sm text-neutral-700 text-center">{stamp}</p>
+                {clusterLines.length > 0 ? (
+                  <div className="w-full flex justify-center">
+                    <div className="bg-white/15 backdrop-blur-lg rounded-2xl px-10 py-4 max-w-md text-black">
+                      <NewsReveal clusters={clusterLines}>
+                        <Link
+                          href="/archive"
+                          className="underline underline-offset-2 decoration-current hover:opacity-80"
+                        >
+                          View Archive
+                        </Link>
+                      </NewsReveal>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-neutral-400 text-center">
+                    News details not available for this image.
+                  </p>
+                )}
+              </>
+            ) : null}
+          </div>
+  
+          {/* Footer also above glow (so text isn’t washed out) */}
+          <footer className="relative z-30 mt-4 mb-16 mt:mb-10 text-xs text-neutral-500">
+            <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
+              <p className="mt-1 text-sm text-neutral-700">
+                Created with OpenAI&apos;s GPT-image-1, GitHub, Vercel, Supabase, Cursor, Claude AI, ChatGPT.{" "}
+                <br />
+                <Link
+                  href="/process"
+                  className="underline underline-offset-2 hover:opacity-80"
+                >
+                  Read about my process
+                </Link>{" "}
+                &rarr;
+              </p>
+              <p className="mt-4 text-neutral-500">
+                © {new Date().getFullYear()} Liza Karimova
+              </p>
             </div>
-            </div>
-          ) : (
-            <p className="text-xs text-neutral-400 text-center">
-              News details not available for this image.
-            </p>
-          )}
-          </>
-        ) : null}
-      </div>
-
-      <footer className="mt-4 mb-16 mt:mb-10 text-xs text-neutral-500">
-       <div className="mx-auto max-w-md px-6 text-center leading-relaxed">
-        <p className="mt-1 text-sm text-neutral-700">
-          Created with OpenAI's GPT-image-1, GitHub, Vercel, Supabase, Cursor, Claude AI, ChatGPT.{" "}
-          <br />
-          <Link
-            href="/process"
-            className="underline underline-offset-2 hover:opacity-80"
-          >
-          Read about my process
-          </Link>
-          {" "} &rarr;
-        </p>
-        <p className="mt-4 text-neutral-500">© {new Date().getFullYear()} Liza Karimova</p>
-       </div>
-      </footer>
-    </main>
-  );
-}
+          </footer>
+        </div>
+      </main>
+    );
+  }

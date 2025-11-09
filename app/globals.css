@@ -61,6 +61,33 @@ body.body-archive::before {
   background-color: var(--background);
 }
 
+/* Process page base */
+body.body-process {
+  position: relative;
+  min-height: 100vh;
+  background: #cecece; /* or any dark-neutral you like */
+}
+
+/* Floating light overlay for process page */
+body.body-process::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--x, 50%) var(--y, 50%),
+    rgba(255, 255, 255, 0.12),
+    transparent 45%
+  );
+  animation: floatLight 8s ease-in-out infinite alternate;
+  z-index: -1; /* sits behind all content */
+  pointer-events: none;
+}
+
+@keyframes floatLight {
+  0% { --x: 30%; --y: 40%; }
+  100% { --x: 70%; --y: 60%; }
+}
+
 /* "No image" pages */
 body.body-plain {
   background-image: none;
@@ -70,4 +97,25 @@ body.body-plain {
 .diff-text {
   mix-blend-mode: difference;
   color: white; /* base color; difference will invert relative to background */
+}
+
+@media (pointer: coarse) {
+  #image-canvas {
+    cursor: auto;
+    .light-cursor {
+      display: none;
+    }
+  }
+}
+
+.light-cursor {
+  position: fixed;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,255,255,0.25), transparent 60%);
+  mix-blend-mode: soft-light;
+  transform: translate(-50%, -50%);
+  z-index: 50; /* definitely above the -1 background */
 }

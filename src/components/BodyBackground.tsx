@@ -7,7 +7,7 @@ import { useEffect } from "react";
 const routeToBodyClass: Record<string, string> = {
   "/": "body-home",
   "/archive": "body-archive",
-  "/process": "body-plain",
+  "/process": "body-process",
 };
 
 const ALL_CLASSES = ["body-home", "body-archive", "body-plain"];
