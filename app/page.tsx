@@ -7,6 +7,8 @@ import { getLatestPainting } from "@/src/server/supabase";
 import { formatInTimeZone } from "date-fns-tz";
 import { config } from "@/lib/config";
 import { NewsReveal } from "@/src/components/NewsReveal";
+import { LightCursor } from "@/src/components/LightCursor";
+
 
 export default async function Home() {
   const painting = await getLatestPainting();

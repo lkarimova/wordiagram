@@ -99,15 +99,6 @@ body.body-plain {
   color: white; /* base color; difference will invert relative to background */
 }
 
-@media (pointer: coarse) {
-  #image-canvas {
-    cursor: auto;
-    .light-cursor {
-      display: none;
-    }
-  }
-}
-
 .light-cursor {
   position: fixed;
   width: 200px;
