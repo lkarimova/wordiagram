@@ -5,6 +5,7 @@ import Image from "next/image";
 import { listArchive } from "@/src/server/supabase";
 import { formatInTimeZone } from "date-fns-tz";
 import { config } from "@/src/lib/config";
+import { LightCursor } from "@/src/components/LightCursor";
 
 const CUTOFF_DATE = "2025-11-06";
 const tz = config.timezone || "America/New_York";
