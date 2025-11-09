@@ -32,7 +32,7 @@ export default async function ProcessPage() {
         </div>
         
         <div className="relative z-30">
-        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
+        <p className="text-sm text-neutral-700 mb-10 leading-relaxed">
           11/06/2025
           <br />{" "}
           <br />
@@ -50,7 +50,7 @@ export default async function ProcessPage() {
           me with questions and feedback. I hope you enjoy this project!
         </p>
 
-        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
+        <p className="text-sm text-neutral-700 mb-10 leading-relaxed">
           <span className="font-medium text-xl text-black">Challenges</span>
           <br />
           Most of the work focused on backend challenges: making the prompt
@@ -90,7 +90,7 @@ export default async function ProcessPage() {
           by sanitizing harsh language and abstracting violent or sensitive terms. I also created <span className="font-bold text-black">fallback heuristics for edge cases</span> through post-processing, such as breaking earthquake news showing up as magnitude numbers "M 5.0" without descriptors.
         </p>
 
-        <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
+        <p className="text-sm text-neutral-700 mb-10 leading-relaxed">
           <span className="font-medium text-xl text-black">Learnings</span>
           <br />{" "}
           <br />
@@ -106,7 +106,7 @@ export default async function ProcessPage() {
           logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
           </p>
 
-          <p className="text-sm text-400 mb-4 leading-relaxed italic">
+          <p className="text-sm text-neutral-700 mb-4 leading-relaxed italic">
           (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
@@ -114,7 +114,7 @@ export default async function ProcessPage() {
           possible, and that my design had to be simplified.)
         </p>
 
-        <p className="text-sm text-neutral-500 mb-4 leading-relaxed">
+        <p className="text-sm text-neutral-700 mb-4 leading-relaxed">
           Paintings from older prompt iterations are displayed below.
         </p>
         </div>

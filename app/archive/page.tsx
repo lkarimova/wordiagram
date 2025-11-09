@@ -38,7 +38,7 @@ export default async function ArchivePage() {
          </div>
 
         <p className="text-sm text-neutral-600 mb-6">
-          For Archive entries prior to November 6, 2025, please visit the <Link href="/process" className="underline">My Process</Link> page.
+          For Archive entries prior to November 6, 2025, please visit the <Link href="/process" className="underline">My Process</Link> page. Select a painting to view details.
         </p>
         </div>
 
