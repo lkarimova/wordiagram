@@ -23,6 +23,7 @@ export default async function ProcessPage() {
         {/* Glow overlay for this page */}
         <LightCursor attachToSelector="#process-root" />
   
+        {/* Title + description – keep above glow */}
         <div className="relative z-30 flex justify-between items-center mb-6">
           <h1 className="text-xl font-medium">My Process</h1>
           <Link href="/" className="underline">

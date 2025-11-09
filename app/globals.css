@@ -62,31 +62,29 @@ body.body-archive::before {
   background-color: var(--background);
 }
 
-/* Process page base */
+/* Base process body (no image here, just fallback color) */
 body.body-process {
+  --background: #ffffff;
+  background-color: var(--background);
   position: relative;
   min-height: 100vh;
-  background: #cecece; /* or any dark-neutral you like */
 }
 
-/* Floating light overlay for process page */
+/* Blurred background image layer */
 body.body-process::before {
   content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(
-    circle at var(--x, 50%) var(--y, 50%),
-    rgba(255, 255, 255, 0.12),
-    transparent 45%
-  );
-  animation: floatLight 8s ease-in-out infinite alternate;
-  z-index: -1; /* sits behind all content */
-  pointer-events: none;
-}
-
-@keyframes floatLight {
-  0% { --x: 30%; --y: 40%; }
-  100% { --x: 70%; --y: 60%; }
+  position: fixed;         /* stays put while you scroll */
+  inset: 0;                /* top: 0; right: 0; bottom: 0; left: 0 */
+  z-index: -1;             /* behind all content */
+  background-image: url("/process_room.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  filter: blur(2px);       /* <-- adjust blur strength here */
+  transform: scale(1.05);  /* avoids visible blur edges at borders */
+  pointer-events: none;    /* make sure it doesn't block clicks */
+  opacity: 0.6;
+  background-color: var(--background);
 }
 
 /* "No image" pages */

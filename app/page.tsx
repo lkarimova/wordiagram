@@ -51,10 +51,8 @@ export default async function Home() {
           {/* Glow overlay: covers this whole container */}
           <LightCursor attachToSelector="#page-root" />
   
-          {/* Content sits ABOVE the glow (z-30) */}
-          <div className="relative z-30 mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6">
-            {/* Title + description */}
-            <header className="text-center max-w-2xl mb-6">
+          {/* Title + description – keep above glow */}
+          <header className="relative z-30 text-center max-w-2xl mb-6">
               <h1 className="text-3xl md:text-4xl font-semibold">Wordiagram</h1>
               <p className="mt-3 text-sm text-neutral-700">
                 A real-time painting of the latest world news.
@@ -63,7 +61,7 @@ export default async function Home() {
                 <br />
                 <span className="italic"> Diagram</span> comes from Latin, meaning "through drawing".
               </p>
-            </header>
+          </header>
   
             {/* Painting frame (still under the glow visually, because glow uses blend mode) */}
             <div className="relative z-10">
@@ -88,7 +86,7 @@ export default async function Home() {
             {/* Date/time and Reveal News */}
             {stamp ? (
               <>
-                <p className="text-sm text-neutral-700 text-center">{stamp}</p>
+                <p className="relative z-30 text-sm text-neutral-700 text-center">{stamp}</p>
                 {clusterLines.length > 0 ? (
                   <div className="w-full flex justify-center">
                     <div className="bg-white/15 backdrop-blur-lg rounded-2xl px-10 py-4 max-w-md text-black">
@@ -130,7 +128,6 @@ export default async function Home() {
               </p>
             </div>
           </footer>
-        </div>
       </main>
     );
   }
