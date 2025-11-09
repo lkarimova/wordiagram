@@ -80,7 +80,7 @@ body.body-process::before {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  filter: blur(2px);       /* <-- adjust blur strength here */
+  filter: blur(4px);       /* <-- adjust blur strength here */
   transform: scale(1.05);  /* avoids visible blur edges at borders */
   pointer-events: none;    /* make sure it doesn't block clicks */
   opacity: 0.6;

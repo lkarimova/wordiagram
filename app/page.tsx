@@ -85,8 +85,8 @@ export default async function Home() {
   
             {/* Date/time and Reveal News */}
             {stamp ? (
-              <>
-                <p className="relative z-30 text-sm text-neutral-700 text-center">{stamp}</p>
+                <div className="relative z-30 w-full flex flex-col items-center gap-2">
+                <p className="text-sm text-neutral-700 text-center">{stamp}</p>
                 {clusterLines.length > 0 ? (
                   <div className="w-full flex justify-center">
                     <div className="bg-white/15 backdrop-blur-lg rounded-2xl px-10 py-4 max-w-md text-black">
@@ -105,9 +105,8 @@ export default async function Home() {
                     News details not available for this image.
                   </p>
                 )}
-              </>
+              </div>
             ) : null}
-          </div>
   
           {/* Footer also above glow (so text isn’t washed out) */}
           <footer className="relative z-30 mt-4 mb-16 mt:mb-10 text-xs text-neutral-500">
@@ -128,6 +127,7 @@ export default async function Home() {
               </p>
             </div>
           </footer>
+          </div>
       </main>
     );
   }

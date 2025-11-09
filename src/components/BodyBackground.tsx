@@ -10,17 +10,23 @@ const routeToBodyClass: Record<string, string> = {
   "/process": "body-process",
 };
 
-const ALL_CLASSES = ["body-home", "body-archive", "body-plain"];
+const ALL_CLASSES = ["body-home", "body-archive", "body-process", "body-plain"];
 
-export function BodyBackground({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const body = document.body;
-    body.classList.remove(...ALL_CLASSES);
-    const cls = routeToBodyClass[pathname] ?? "body-plain";
-    body.classList.add(cls);
-  }, [pathname]);
-
-  return <>{children}</>;
-}
+export function BodyClass() {
+    const pathname = usePathname();
+    useEffect(() => {
+      const cls = ROUTE_CLASS_MAP[pathname] ?? "body-plain";
+  
+      // Remove any previous page classes
+      ALL_BODY_CLASSES.forEach(c => document.body.classList.remove(c));
+      // Add the current one
+      document.body.classList.add(cls);
+  
+      // Optional cleanup on unmount
+      return () => {
+        ALL_BODY_CLASSES.forEach(c => document.body.classList.remove(c));
+      };
+    }, [pathname]);
+  
+    return null;
+  }
