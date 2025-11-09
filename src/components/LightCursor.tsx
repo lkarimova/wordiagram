@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 
 type LightCursorProps = {
-  /** Optional: restrict the effect to a specific selector (e.g. "#canvas") */
   attachToSelector?: string;
 };
 
@@ -19,6 +18,7 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
 
     if (!target) return;
 
+    // IMPORTANT: do NOT import MouseEvent from React.
     const handleMove = (e: MouseEvent) => {
       const bounds =
         target instanceof Window
@@ -34,13 +34,14 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
 
     const handleLeave = () => setVisible(false);
 
-    target.addEventListener("mousemove", handleMove);
+    // Cast handler to EventListener so TS is happy
+    target.addEventListener("mousemove", handleMove as EventListener);
     if (!(target instanceof Window)) {
       target.addEventListener("mouseleave", handleLeave);
     }
 
     return () => {
-      target.removeEventListener("mousemove", handleMove);
+      target.removeEventListener("mousemove", handleMove as EventListener);
       if (!(target instanceof Window)) {
         target.removeEventListener("mouseleave", handleLeave);
       }
@@ -49,7 +50,6 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
 
   return (
     <div
-      // Container that sits over the image area
       className="pointer-events-none absolute inset-0 z-20"
       style={{
         opacity: visible ? 1 : 0,
@@ -65,11 +65,9 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
           top: pos.y,
           transform: "translate(-50%, -50%)",
           borderRadius: "999px",
-          // Soft radial light
           background:
             "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0) 70%)",
           filter: "blur(10px)",
-          // This is what makes it “lighten” things underneath
           mixBlendMode: "screen",
         }}
       />
