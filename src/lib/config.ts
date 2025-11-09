@@ -71,18 +71,7 @@ export const config = (() => {
     aspect,
 
     news: {
-      worldSources:
-        csv("NEWS_SOURCES_WORLD", []).length > 0
-          ? csv("NEWS_SOURCES_WORLD", [])
-          : (env.NEWS_SOURCES_WORLD || "")
-              .split(",")
-              .map(s => s.trim())
-              .filter(Boolean).length > 0
-          ? (env.NEWS_SOURCES_WORLD || "")
-              .split(",")
-              .map(s => s.trim())
-              .filter(Boolean)
-          : WORLD_FALLBACK,
+      worldSources: WORLD_FALLBACK,
       cacheMinutes: 60, // Cache news for 60 minutes
     },
 
@@ -92,12 +81,12 @@ export const config = (() => {
         minItems: 7,        // At least 7 items in cluster
         minSources: 5,      // From at least 5 different sources
         recencyBoost: 0.95, // OR very recent with 7+ items
-        minBreakingClusters: 3, // NEW: require at least 3 breaking clusters overall
+        minBreakingClusters: 2, // NEW: require at least 2 breaking clusters overall
       },
     },
 
     // Headline change threshold
-    headlineChangeThreshold: 0.50, // 50% change triggers clustering check
+    headlineChangeThreshold: 0.80, // 80% change triggers clustering check
 
     storage: {
       publicPrefix: "world-news-painting",

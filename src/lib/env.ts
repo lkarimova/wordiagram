@@ -1,8 +1,6 @@
 import { z } from 'zod';
 
 export const EnvSchema = z.object({
-  NEWS_SOURCES_WORLD: z.string().optional().default('https://www.reuters.com/world/rss,https://www.bbc.com/news/world/rss.xml,https://www.aljazeera.com/xml/rss/all.xml,https://www.un.org/rss.xml,https://www.who.int/feeds/entity/csr/don/en/rss.xml'),
-  NEWS_SOURCES_ART: z.string().optional().default('https://www.theartnewspaper.com/rss,https://news.artnet.com/feed,https://www.artnews.com/c/art-news/news/feed/'),
   OPENAI_API_KEY: z.string().optional(),
   STABILITY_API_KEY: z.string().optional(),
   SUPABASE_URL: z.string().optional(),

@@ -37,16 +37,26 @@ body.body-home {
   background-attachment: scroll;
   background-color: var(--background); /* fallback while loading */
 }
-/* Archive page background */
+/* Base archive body (no image here, just fallback color) */
 body.body-archive {
-  background-image:
-  linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5)),  
-  url("/archive_room_1.jpg");
+  background-color: var(--background);
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Blurred background image layer */
+body.body-archive::before {
+  content: "";
+  position: fixed;         /* stays put while you scroll */
+  inset: 0;                /* top: 0; right: 0; bottom: 0; left: 0 */
+  z-index: -1;             /* behind all content */
+  background-image: url("/archive_room_1.jpg");
   background-size: cover;
-  background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-color: var(--background); /* fallback */
+  background-position: center center;
+  filter: blur(4px);       /* <-- adjust blur strength here */
+  transform: scale(1.05);  /* avoids visible blur edges at borders */
+  pointer-events: none;    /* make sure it doesn't block clicks */
 }
 
 /* "No image" pages */
