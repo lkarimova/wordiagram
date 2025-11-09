@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
 
     // Step 3: Generate new image for breaking news
     console.log("[update] Breaking news detected, generating new image");
+    // IMPORTANT: This is the only place that should call image generation.
+   // All early exits above return BEFORE we hit the Images API.
     const row = await runBreakingGeneration({
       world,
       worldClusters,
