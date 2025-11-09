@@ -29,7 +29,7 @@ body {
 /* Homepage background: fixed */
 body.body-home {
   background-image:
-    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
     url("/living_room_1.jpg");
   background-size: cover;  
   background-repeat: no-repeat;
@@ -83,7 +83,7 @@ body.body-process::before {
   filter: blur(4px);       /* <-- adjust blur strength here */
   transform: scale(1.05);  /* avoids visible blur edges at borders */
   pointer-events: none;    /* make sure it doesn't block clicks */
-  opacity: 0.6;
+  opacity: 1;
   background-color: var(--background);
 }
 

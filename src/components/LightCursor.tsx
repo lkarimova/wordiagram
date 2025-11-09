@@ -68,7 +68,7 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
           background:
             "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0) 70%)",
           filter: "blur(10px)",
-          mixBlendMode: "screen",
+          mixBlendMode: "overlay",
         }}
       />
     </div>
