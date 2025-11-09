@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { listArchive, getLatestPainting } from "@/src/server/supabase";
 import { formatInTimeZone } from "date-fns-tz";
+import { LightCursor } from "@/src/components/LightCursor";
 
 const TZ = "America/New_York";
 const CUTOFF_DATE = "2025-11-06";
@@ -22,8 +23,15 @@ export default async function ArchivePage() {
 
   return (
     <main className="min-h-screen text-black">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="flex justify-between items-center mb-6">
+      <div
+        id="archive-root"
+        className="relative max-w-6xl mx-auto px-4 py-10"
+      >
+        {/* Cursor glow for archive */}
+        <LightCursor attachToSelector="#archive-root" />
+
+        {/* Header ABOVE glow */}
+        <div className="relative z-30 flex justify-between items-center mb-6">
           <h1 className="text-xl font-medium">Archive</h1>
           <Link href="/" className="underline">Back to today</Link>
         </div>
@@ -33,8 +41,9 @@ export default async function ArchivePage() {
         </p>
 
         {archiveItems.length === 0 ? (
-          <p className="text-sm text-neutral-600">No Archive entries yet.</p>
+          <p className="relative z-30 text-sm text-neutral-600">No Archive entries yet.</p>
         ) : (
+          <div className="relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {archiveItems.map((p) => {
               const src = p.image_url;
@@ -56,10 +65,11 @@ export default async function ArchivePage() {
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
-                  <p className="mt-2 text-sm text-neutral-700 text-center">{label}</p>
+                  <p className="relative z-30 mt-2 text-sm text-neutral-700 text-center">{label}</p>
                 </Link>
               );
             })}
+          </div>
           </div>
         )}
       </div>

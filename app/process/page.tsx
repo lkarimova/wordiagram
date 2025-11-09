@@ -117,12 +117,14 @@ export default async function ProcessPage() {
         <p className="text-sm text-neutral-500 mb-4 leading-relaxed">
           Paintings from older prompt iterations are displayed below.
         </p>
+        </div>
 
         {processItems.length === 0 ? (
-          <p className="text-sm text-neutral-600">
+          <p className="relative z-30 text-sm text-neutral-600">
             No earlier images to display.
           </p>
         ) : (
+        <div className="relative z-10 mt-4">  
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {processItems.map((p) => {
               const src = p.image_url;
@@ -159,8 +161,8 @@ export default async function ProcessPage() {
               );
             })}
           </div>
+          </div>
         )}
-        </div>
       </div>
     </main>
   );
