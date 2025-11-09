@@ -51,7 +51,7 @@ body.body-archive::before {
   position: fixed;         /* stays put while you scroll */
   inset: 0;                /* top: 0; right: 0; bottom: 0; left: 0 */
   z-index: -1;             /* behind all content */
-  background-image: url("/archive_room_1.jpg");
+  background-image: url("/archive_room.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
@@ -83,7 +83,7 @@ body.body-process::before {
   filter: blur(4px);       /* <-- adjust blur strength here */
   transform: scale(1.05);  /* avoids visible blur edges at borders */
   pointer-events: none;    /* make sure it doesn't block clicks */
-  opacity: 1;
+  opacity: 0.8;
   background-color: var(--background);
 }
 

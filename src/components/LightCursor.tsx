@@ -59,8 +59,8 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
       <div
         style={{
           position: "absolute",
-          width: "220px",
-          height: "220px",
+          width: "240px",
+          height: "240px",
           left: pos.x,
           top: pos.y,
           transform: "translate(-50%, -50%)",
@@ -68,7 +68,7 @@ export function LightCursor({ attachToSelector }: LightCursorProps) {
           background:
             "radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.4) 45%, rgba(255,255,255,0) 70%)",
           filter: "blur(10px)",
-          mixBlendMode: "overlay",
+          mixBlendMode: "soft-light",
         }}
       />
     </div>
