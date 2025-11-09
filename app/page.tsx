@@ -46,14 +46,9 @@ export default async function Home() {
         {/* NEW: root container with background image */}
         <div
           id="page-root"
-          className="relative min-h-screen w-full bg-cover bg-center"
-          style={{
-            // put your actual background here
-            // or replace with a Tailwind class if you're using that
-            backgroundImage: "url('/your-background.jpg')",
-          }}
+          className="relative mx-auto px-4 py-10 pb-4 flex flex-col items-center gap-6"
         >
-          {/* Glow overlay: covers the whole background area */}
+          {/* Glow overlay: covers this whole container */}
           <LightCursor attachToSelector="#page-root" />
   
           {/* Content sits ABOVE the glow (z-30) */}

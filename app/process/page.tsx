@@ -14,15 +14,22 @@ export default async function ProcessPage() {
   const processItems = items.filter((i) => i.date < CUTOFF_DATE);
 
   return (
-    <main className="min-h-screen bg-white text-black">
-      <div className="max-w-6xl mx-auto px-4 py-10">
-        <div className="flex justify-between items-center mb-6">
+    <main className="min-h-screen text-black">
+      <div
+        id="process-root"
+        className="relative max-w-6xl mx-auto px-4 py-10"
+      >
+        {/* Glow overlay for this page */}
+        <LightCursor attachToSelector="#process-root" />
+  
+        <div className="relative z-30 flex justify-between items-center mb-6">
           <h1 className="text-xl font-medium">My Process</h1>
           <Link href="/" className="underline">
             Back to today
           </Link>
         </div>
-
+        
+        <div className="relative z-30">
         <p className="text-sm text-neutral-500 mb-10 leading-relaxed">
           11/06/2025
           <br />{" "}
@@ -151,6 +158,7 @@ export default async function ProcessPage() {
             })}
           </div>
         )}
+        </div>
       </div>
     </main>
   );
