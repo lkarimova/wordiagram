@@ -83,7 +83,7 @@ body.body-process::before {
   filter: blur(4px);       /* <-- adjust blur strength here */
   transform: scale(1.05);  /* avoids visible blur edges at borders */
   pointer-events: none;    /* make sure it doesn't block clicks */
-  opacity: 1;
+  opacity: 0.8;
   background-color: var(--background);
 }
 

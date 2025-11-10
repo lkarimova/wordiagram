@@ -66,13 +66,13 @@ export const config = (() => {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
       dailyHourLocal: 6,         // 6:00 AM ET
-      breakingCheckMinutes: 60,  // Check every 60 minutes for breaking news
+      breakingCheckMinutes: 120,  // Check every 120 minutes for breaking news
     },
     aspect,
 
     news: {
       worldSources: WORLD_FALLBACK,
-      cacheMinutes: 60, // Cache news for 60 minutes
+      cacheMinutes: 120, // Cache news for 120 minutes
     },
 
     // Breaking news detection thresholds
@@ -81,7 +81,7 @@ export const config = (() => {
         minItems: 7,        // At least 7 items in cluster
         minSources: 5,      // From at least 5 different sources
         recencyBoost: 0.95, // OR very recent with 7+ items
-        minBreakingClusters: 3, // NEW: require at least 3 breaking clusters overall
+        minBreakingClusters: 4, // NEW: require at least 4 breaking clusters overall
       },
     },
 

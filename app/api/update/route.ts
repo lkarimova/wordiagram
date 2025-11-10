@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 /**
  * Breaking news check endpoint
- * Called every 15 minutes to check for breaking news
+ * Called every 120 minutes to check for breaking news
  * Only generates new image if:
  * 1. Headlines have changed significantly (lightweight check)
  * 2. Breaking news is detected (clustering check with embeddings)
