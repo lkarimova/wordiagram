@@ -39,8 +39,8 @@ export default async function ProcessPage() {
           I have been learning how to code for past 3 weeks. As someone that has
           never coded before, this was a fun and challenging first project. I
           learned what API&apos;s, GitHub, Vercel, Supabase were, and how to use
-          Cursor, Claude and Chat GPT to build a project that uses backend to
-          <span className="font-bold text-black"> pull in live data,</span> process it through prompt engineering, and <span className="font-bold text-black">render meaningfulimages.</span> Please feel free to{" "}
+          Cursor, Claude and Chat GPT to build an <span className="font-bold text-black">automated pipeline</span> that 
+          <span className="font-bold text-black"> gathers live data,</span> processes it through <span className="font-bold text-black">prompt engineering,</span> and renders<span className="font-bold text-black"> a meaningful image.</span> Please feel free to{" "}
           <a
             href="mailto:lkarimova.design@gmail.com"
             className="font-bold text-black underline underline-offset-2 hover:text-neutral-600"
@@ -106,7 +106,7 @@ export default async function ProcessPage() {
           logic, and (c) it cannot <span className="font-bold text-black">apply artistic style</span> without modifying the image content.
           </p>
 
-          <p className="text-sm text-neutral-700 mb-4 leading-relaxed italic">
+          <p className="text-sm text-neutral-700 mb-10 leading-relaxed italic">
           (I originally started off with asking GPT-Image-1 to determine the
           image style based on World Art News. I also asked it to keep updating
           images with masked, additive edits based on breaking World and Art
@@ -114,8 +114,8 @@ export default async function ProcessPage() {
           possible, and that my design had to be simplified.)
         </p>
 
-        <p className="text-sm text-neutral-700 mb-4 leading-relaxed">
-          Paintings from older prompt iterations are displayed below.
+        <p className="text-sm text-neutral-700 mb-10 leading-relaxed">
+          Paintings from older prompt iterations are displayed below. Scroll down to view how the prompt evolution affected the generated images.
         </p>
         </div>
 
