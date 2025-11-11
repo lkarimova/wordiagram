@@ -8,8 +8,8 @@ export const EnvSchema = z.object({
   BASIC_AUTH_USER: z.string().optional(),
   BASIC_AUTH_PASS: z.string().optional(),
   TIMEZONE: z.string().optional().default('America/New_York'),
-  MOCK_NEWS: z.string().optional().default('true'),
-  MOCK_IMAGES: z.string().optional().default('true'),
+  MOCK_NEWS: z.string().optional().default('false'),
+  MOCK_IMAGES: z.string().optional().default('false'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

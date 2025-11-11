@@ -93,8 +93,8 @@ export const config = (() => {
     },
 
     mock: {
-      news: (env.MOCK_NEWS || "false") === "true",
-      images: (env.MOCK_IMAGES || "false") === "true",
+      news: (env.MOCK_NEWS === "true",
+      images: (env.MOCK_IMAGES === "true",
     },
   } as const;
 })();
