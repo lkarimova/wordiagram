@@ -65,6 +65,7 @@ export default async function ArchivePage() {
                       fill
                       style={{ objectFit: "cover" }}
                       sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      unoptimized
                     />
                   </div>
                   <p className="relative z-30 mt-2 text-sm text-neutral-700 text-center">{label}</p>
