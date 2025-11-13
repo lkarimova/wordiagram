@@ -66,13 +66,13 @@ export const config = (() => {
     timezone: env.TIMEZONE || "America/New_York",
     cron: {
       dailyHourLocal: 6,         // 6:00 AM ET
-      breakingCheckMinutes: 240,  // Check every 240 minutes for breaking news
+      breakingCheckMinutes: 720,  // Check every 720 minutes (12 hours) for breaking news
     },
     aspect,
 
     news: {
       worldSources: WORLD_FALLBACK,
-      cacheMinutes: 200, // Cache news for 200 minutes
+      cacheMinutes: 700, // Cache news for 700 minutes
     },
 
     // Breaking news detection thresholds
