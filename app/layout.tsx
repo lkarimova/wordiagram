@@ -41,6 +41,28 @@ export default function RootLayout({
           `,
         }}
       />
+      
+      {/* Google Analytics – load gtag.js */}
+      <Script
+        id="ga-tag"
+        src="https://www.googletagmanager.com/gtag/js?id=G-QNH840ZJ5Q"
+        strategy="afterInteractive"
+      />
+
+      {/* Google Analytics – init */}
+      <Script
+        id="ga-init"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-QNH840ZJ5Q');
+          `,
+        }}
+      />
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen text-black`}
       >
