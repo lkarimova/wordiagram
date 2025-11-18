@@ -177,6 +177,125 @@ function normalizeClusterTitle(rawTitle: string, memberTitles: string[]): string
   return (rawTitle || "misc").trim();
 }
 
+// ---------- Cluster overlap helpers ----------
+
+type ClusterWithCentroid = Cluster & { _centroid?: number[] };
+
+// Build or reuse a centroid for a cluster from its member embeddings
+function buildClusterCentroid(c: ClusterWithCentroid): number[] | null {
+  if (c._centroid && c._centroid.length) return c._centroid;
+
+  const items = (c.items as any[]) || [];
+  const firstWithEmb = items.find(i => Array.isArray(i?.embedding));
+  if (!firstWithEmb) return null;
+
+  const dim = firstWithEmb.embedding.length;
+  const sum = new Array(dim).fill(0);
+  let n = 0;
+
+  for (const it of items) {
+    const emb = it.embedding;
+    if (!Array.isArray(emb) || emb.length !== dim) continue;
+    for (let i = 0; i < dim; i++) sum[i] += emb[i];
+    n++;
+  }
+
+  if (!n) return null;
+
+  const centroid = sum.map(v => v / n);
+  c._centroid = centroid;
+  return centroid;
+}
+
+function clusterCentroidSim(a: ClusterWithCentroid, b: ClusterWithCentroid): number {
+  const ca = buildClusterCentroid(a);
+  const cb = buildClusterCentroid(b);
+  if (!ca || !cb || !ca.length || !cb.length) return 0;
+  return cosineSimilarity(ca, cb);
+}
+
+function jaccardByUrl(a: Cluster, b: Cluster): number {
+  const A = new Set(a.items.map(i => i.url).filter(Boolean));
+  const B = new Set(b.items.map(i => i.url).filter(Boolean));
+  if (!A.size && !B.size) return 0;
+
+  let inter = 0;
+  for (const u of A) if (B.has(u)) inter++;
+
+  const unionSize = A.size + B.size - inter;
+  return unionSize === 0 ? 0 : inter / unionSize;
+}
+
+/**
+ * Remove / merge overlapping clusters.
+ * - First, dedupe within `breaking` (keep higher-score cluster when near-duplicates).
+ * - Then, drop any `existing` cluster that overlaps with the deduped breaking set.
+ */
+export function dedupeOverlappingClusters(
+  breaking: Cluster[],
+  existing: Cluster[],
+  opts?: { jaccard?: number; centroidSim?: number }
+): { breaking: Cluster[]; existing: Cluster[] } {
+  const J = opts?.jaccard ?? 0.3;      // URL-overlap threshold
+  const S = opts?.centroidSim ?? 0.85; // centroid cosine threshold
+
+  const keptBreaking: ClusterWithCentroid[] = [];
+
+  // 1) Dedupe within breaking
+  for (const cRaw of breaking) {
+    const c = cRaw as ClusterWithCentroid;
+    let dupIndex = -1;
+
+    for (let i = 0; i < keptBreaking.length; i++) {
+      const k = keptBreaking[i];
+
+      // URL overlap test
+      const j = jaccardByUrl(c, k);
+      if (j >= J) {
+        dupIndex = i;
+        break;
+      }
+
+      // Centroid similarity test
+      const sim = clusterCentroidSim(c, k);
+      if (sim >= S) {
+        dupIndex = i;
+        break;
+      }
+    }
+
+    if (dupIndex === -1) {
+      keptBreaking.push(c);
+    } else {
+      const existing = keptBreaking[dupIndex];
+      const better =
+        (c.score ?? 0) > (existing.score ?? 0) ? c : existing;
+      keptBreaking[dupIndex] = better;
+    }
+  }
+
+  // 2) Remove existing clusters that overlap with any keptBreaking
+  const prunedExisting: Cluster[] = [];
+  outer: for (const eRaw of existing) {
+    const e = eRaw as ClusterWithCentroid;
+
+    for (const b of keptBreaking) {
+      const j = jaccardByUrl(e, b);
+      if (j >= J) continue outer;
+
+      const sim = clusterCentroidSim(e, b);
+      if (sim >= S) continue outer;
+    }
+
+    prunedExisting.push(e);
+  }
+
+  return {
+    breaking: keptBreaking,
+    existing: prunedExisting,
+  };
+}
+
 // ---------- RSS fetch ----------
 async function fetchRss(url: string): Promise<NewsItem[]> {
   try {
@@ -296,7 +415,7 @@ export async function rankAndCluster(items: NewsItem[]): Promise<Cluster[]> {
   }));
 
   // Step 2: Greedy semantic clustering
-  const similarityThreshold = 0.8; // tune as needed
+  const similarityThreshold = 0.3; // tune as needed
 
   type InternalCluster = {
     centroid: number[];

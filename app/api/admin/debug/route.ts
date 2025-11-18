@@ -1,7 +1,7 @@
 // app/api/admin/debug/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { basicAuth } from '@/lib/utils/auth';
-import { getLatestPainting } from '@/src/server/supabase';
+import { getLatestPainting } from '@/server/supabase';
 
 export const runtime = 'nodejs';
 
@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
     aspect: row.model_info?.aspect,
     prompt: row.prompt,
     world_theme_summary: row.world_theme_summary,
+    clusterDebug: row.model_info?.debug?.clusterDebug ?? null,
     composer: row.model_info?.debug?.composer ?? null,
     newsSelected: row.model_info?.debug?.newsSelected ?? null,
     clustersPicked: row.model_info?.debug?.clustersPicked ?? null,

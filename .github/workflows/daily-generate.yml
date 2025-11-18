@@ -2,7 +2,7 @@ name: Daily Generate (6am ET)
 
 on:
   schedule:
-    - cron: "0 10 * * *"   # UTC; change when DST shifts
+    - cron: "0 11 * * *"   # UTC; change to 11 from 10 when DST shifts
   workflow_dispatch:
 
 jobs:

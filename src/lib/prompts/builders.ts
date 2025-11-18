@@ -153,7 +153,7 @@ function softenTitleForPrompt(title: string): string | null {
  */
 export function buildNewsPrompt(worldClusters: Cluster[]): ComposePromptResult {
   // Extract top themes from clusters
-  const topThemes = worldClusters.slice(0, 5);
+  const topThemes = worldClusters.slice(0, 10);
   
   // Create symbolic, metaphorical motifs from news themes
   const motifs = topThemes
