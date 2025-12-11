@@ -20,6 +20,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Check if generations are paused
+  const isPaused = process.env.PAUSE_GENERATIONS === "true";
+  if (isPaused) {
+    return NextResponse.json(
+      {
+        ok: false,
+        paused: true,
+        message: "Generations are currently paused",
+      },
+      { status: 200 }
+    );
+  }
+
   try {
     console.log("[update] Starting breaking news check");
     

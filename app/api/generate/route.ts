@@ -12,6 +12,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Check if generations are paused
+  const isPaused = process.env.PAUSE_GENERATIONS === "true";
+  if (isPaused) {
+    return NextResponse.json(
+      {
+        ok: false,
+        paused: true,
+        message: "Generations are currently paused",
+      },
+      { status: 200 }
+    );
+  }
+
   try {
     const result = await runDailyGeneration(); // should save image + return URL/metadata
     return NextResponse.json({ ok: true, result }, { status: 200 });

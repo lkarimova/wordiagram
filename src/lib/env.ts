@@ -10,6 +10,7 @@ export const EnvSchema = z.object({
   TIMEZONE: z.string().optional().default('America/New_York'),
   MOCK_NEWS: z.string().optional().default('false'),
   MOCK_IMAGES: z.string().optional().default('false'),
+  PAUSE_GENERATIONS: z.string().optional().default('false'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
